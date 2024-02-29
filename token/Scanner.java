@@ -58,7 +58,7 @@ public class Scanner {
         Token token = getToken();
         updateBracketsStack(token);
 
-        if (token.SYMBOL != Symbol.COMMENT) {
+        if (!hasError() && token.SYMBOL != Symbol.COMMENT) {
             tokens.add(token);
         }
     }
@@ -79,12 +79,8 @@ public class Scanner {
 
         // No match - Error
         hasError = true;
-
-        String msg = expectString?
-        String.format("Unclosed String on line %d.", line) :
-        String.format("Unexpected Token on line %d.", line);
-
-		return new Token(Symbol.ERROR, msg, null, line);
+        if (expectString) return addErrorToken("Unclosed String");
+        return addErrorToken("Unexpected Token");
 	}
 
     private void updateBracketsStack(Token currToken) {
@@ -105,9 +101,11 @@ public class Scanner {
         }
     }
 
-    private void addErrorToken(String msg) {
-        tokens.add(new Token(Token.Symbol.ERROR, String.format("Line %d: %s", line+1, msg), null, line));
+    private Token addErrorToken(String msg) {
+        Token token = new Token(Token.Symbol.ERROR, String.format("Line %d: %s", line+1, msg), null, line);
+        tokens.add(token);
         hasError = true;
+        return token;
     }
 
     private void skipBlanks() {
