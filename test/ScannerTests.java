@@ -6,9 +6,9 @@ import java.util.ArrayList;
 
 import org.junit.Test;
 
-import main.Utils;
 import token.Scanner;
 import token.Token;
+import utils.Utils;
 
 public class ScannerTests {
 

@@ -6,7 +6,7 @@ public class Add extends Expr {
     }
 
     @Override
-    public int eval() {
+    public double eval() {
         return children[0].eval() + children[1].eval();
     }
 

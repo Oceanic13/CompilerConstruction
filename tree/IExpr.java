@@ -1,7 +1,7 @@
 package tree;
 public interface IExpr
 {
-    public int eval();
+    public double eval();
 
     @Override
     public String toString();

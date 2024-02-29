@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Set;
 
 import token.Token.Symbol;
+import utils.IStack;
+import utils.Stack;
+import utils.Utils;
 
 public class Scanner {
 
@@ -12,6 +15,10 @@ public class Scanner {
     private int line, position;
     private boolean finished, hasError;
     private static final Set<Character> BLANKS = Set.of('\n', '\r', '\t', ' ');
+
+    private IStack<Token.Symbol> brackets;
+    private static final Token.Symbol[] LBRACKETS = {Symbol.LPAREN, Symbol.LBOXBRACKET, Symbol.LBRACE};
+    private static final Token.Symbol[] RBRACKETS = {Symbol.RPAREN, Symbol.RBOXBRACKET, Symbol.RBRACE};
 
     public Scanner(String text) {
         reset(text);
@@ -24,11 +31,16 @@ public class Scanner {
         this.position = 0;
         this.finished = false;
         this.hasError = false;
+        this.brackets = new Stack<>();
     }
     
     public ArrayList<Token> tokenize() {
         while (!isFinished())
             advance();
+
+        if (!brackets.isEmpty()) {
+            addErrorToken("Mismatched Brackets");
+        }
 
         // append end of line token if no error has occured
         if (!hasError())
@@ -44,11 +56,15 @@ public class Scanner {
             return;
 
         Token token = getToken();
-        if (token.SYMBOL != Symbol.COMMENT) // ignore comments
+        updateBracketsStack(token);
+
+        if (token.SYMBOL != Symbol.COMMENT) {
             tokens.add(token);
+        }
     }
 
     private Token getToken() {
+        boolean expectString = (rawText.charAt(position) == '\"');
 
         // Find next token
 		int end = -1;
@@ -61,10 +77,38 @@ public class Scanner {
 			}
 		}
 
-        // Unexpected token
+        // No match - Error
         hasError = true;
-		return new Token(Symbol.ERROR, String.format("Unexpected Token on line %d.", line), null, line);
+
+        String msg = expectString?
+        String.format("Unclosed String on line %d.", line) :
+        String.format("Unexpected Token on line %d.", line);
+
+		return new Token(Symbol.ERROR, msg, null, line);
 	}
+
+    private void updateBracketsStack(Token currToken) {
+        Token.Symbol s = currToken.SYMBOL;
+
+        // push left bracket
+        if (Utils.contains(LBRACKETS, s)) {
+            brackets.push(s);
+            return;
+        }
+
+        // pop bracket if right bracket found, must match
+        int i = Utils.indexOf(RBRACKETS, s);
+        if (i != -1) {
+            if (brackets.isEmpty() || brackets.pop() != LBRACKETS[i]) {
+                addErrorToken("Mismatched Brackets");
+            }
+        }
+    }
+
+    private void addErrorToken(String msg) {
+        tokens.add(new Token(Token.Symbol.ERROR, String.format("Line %d: %s", line+1, msg), null, line));
+        hasError = true;
+    }
 
     private void skipBlanks() {
         while (!isFinished() && BLANKS.contains(rawText.charAt(position))) {

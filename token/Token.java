@@ -38,8 +38,8 @@ public class Token {
 
         LPAREN("\\(", Type.SPECIAL),
 	    RPAREN("\\)", Type.SPECIAL),
-	    LBRACKET("\\[", Type.SPECIAL),
-	    RBRACKET("\\]", Type.SPECIAL),
+	    LBOXBRACKET("\\[", Type.SPECIAL),
+	    RBOXBRACKET("\\]", Type.SPECIAL),
         LBRACE("\\{", Type.SPECIAL),
 	    RBRACE("\\}", Type.SPECIAL),
         SEMICOLON(";", Type.SPECIAL),

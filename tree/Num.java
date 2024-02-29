@@ -1,14 +1,14 @@
 package tree;
 public class Num implements IExpr {
 
-    private int value;
+    private double value;
 
-    public Num(int value) {
+    public Num(double value) {
         this.value = value;
     }
 
     @Override
-    public int eval() {
+    public double eval() {
         return this.value;
     }
     

@@ -1,4 +1,4 @@
-package main;
+package utils;
 public interface IStack<E> {
     public boolean isEmpty();
     public int size();

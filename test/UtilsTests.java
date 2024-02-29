@@ -1,21 +1,22 @@
 package test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import main.Utils;
+import utils.Utils;
 
 public class UtilsTests {
     
     @Test
     public void testBalancedBrackets() {
-        assertTrue(Utils.hasBalancedBrackets("(hello) (world)"));
-        assertFalse(Utils.hasBalancedBrackets("static void main(String[] args) {"));
-        assertTrue(Utils.hasBalancedBrackets("{{{((((()))))}}}"));
-        assertFalse(Utils.hasBalancedBrackets("{{{(([((())))}}}"));
-        assertFalse(Utils.hasBalancedBrackets("}"));
-        assertFalse(Utils.hasBalancedBrackets("[}"));
+        assertEquals(-1, Utils.findBracketsMismatch("(hello) (world)"));
+        assertEquals(0, Utils.findBracketsMismatch("static void main(String[] args) {"));
+        assertEquals(-1, Utils.findBracketsMismatch("{{{((((()))))}}}"));
+        assertEquals(0, Utils.findBracketsMismatch("{{{(([((())))}}}"));
+        assertEquals(0, Utils.findBracketsMismatch("}"));
+        assertEquals(0, Utils.findBracketsMismatch("[}"));
     }
 }
