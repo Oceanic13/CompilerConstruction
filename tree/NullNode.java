@@ -37,8 +37,8 @@ public class NullNode implements INode {
     }
 
     @Override
-    public void eval() {
-        return;
+    public Data eval() {
+        return null;
     }
     
 }

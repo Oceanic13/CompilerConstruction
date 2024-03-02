@@ -2,8 +2,8 @@ package main;
 
 import java.util.ArrayList;
 
-import token.Scanner;
-import token.Token;
+import scanner.Scanner;
+import scanner.Token;
 import utils.Utils;
 
 public class Launcher {

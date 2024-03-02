@@ -1,5 +1,6 @@
-package token;
+package scanner;
 
+import java.util.HashMap;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,9 +29,7 @@ public class Token {
     }
 
     public static enum Type {
-        RELOP, // relational operator
-        ARMOP, // arithmetic operator
-        ASSOP, // assignment operator
+        OP, // binary operator
         SPECIAL,
         KEYWORD,
         STR,
@@ -51,22 +50,22 @@ public class Token {
 	    RBRACE("\\}", Type.SPECIAL),
         SEMICOLON(";", Type.SPECIAL),
         
-        ADD("\\+", Type.ARMOP),
-        SUB("-", Type.ARMOP),
-        MULT("\\*", Type.ARMOP),
-        DIV("/", Type.ARMOP),
+        ADD("\\+", Type.OP),
+        SUB("-", Type.OP),
+        MULT("\\*", Type.OP),
+        DIV("/", Type.OP),
 
-        LEQ("<=", Type.RELOP),
-        GEQ(">=", Type.RELOP),
-        LESS("<", Type.RELOP),
-        GREATER(">", Type.RELOP),
-        EQ("==", Type.RELOP),
-        NEQ("!=", Type.RELOP),
-        OR("or|\\|\\|", Type.RELOP),
-        AND("and|&&", Type.RELOP),
-        NOT("!|not", Type.RELOP),
+        LEQ("<=", Type.OP),
+        GEQ(">=", Type.OP),
+        LESS("<", Type.OP),
+        GREATER(">", Type.OP),
+        EQ("==", Type.OP),
+        NEQ("!=", Type.OP),
+        OR("or|\\|\\|", Type.OP),
+        AND("and|&&", Type.OP),
+        NOT("!|not", Type.OP),
 
-        ASSIGN("=", Type.ASSOP),
+        ASSIGN("=", Type.OP),
 
         TRUE("true", Type.KEYWORD),
         FALSE("false", Type.KEYWORD),
@@ -76,7 +75,8 @@ public class Token {
         ELSE("else", Type.KEYWORD),
         WHILE("while", Type.KEYWORD),
 
-        NUM("\\d*\\.{0,1}\\d+", Type.NUM), // integer or decimal
+        FLOAT("\\d*\\.{0,1}\\d+", Type.NUM), // float
+        INT("\\d+", Type.NUM), // integer
         STR("\"[^\"]*\"", Type.STR),
         ID("\\w+", Type.ID), // identifier
 

@@ -16,5 +16,6 @@ public class TreeTests {
     public void testSimpleExpressionTree() {
         IExpr tree = new Add(new Num(5), new Mult(new Num(2), new Num(10)));
         assertEquals(25, tree.eval(), Utils.EPSILON);
+        System.out.println(tree.toString());
     }
 }

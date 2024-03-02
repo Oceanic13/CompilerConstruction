@@ -7,6 +7,6 @@ public interface INode {
     public INode middle();
     public INode right();
     public int arity();
-    public void eval();
+    public Data eval();
 
 }

@@ -8,8 +8,8 @@ import java.util.ArrayList;
 
 import org.junit.Test;
 
-import token.Scanner;
-import token.Token;
+import scanner.Scanner;
+import scanner.Token;
 import utils.Utils;
 
 public class ScannerTests {

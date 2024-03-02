@@ -1,8 +1,8 @@
-package token;
+package scanner;
 
 import java.util.ArrayList;
 
-import token.Token.Name;
+import scanner.Token.Name;
 import utils.IStack;
 import utils.Stack;
 import utils.Utils;
