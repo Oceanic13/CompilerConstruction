@@ -1,50 +1,57 @@
 package token;
 
 import java.util.ArrayList;
-import java.util.Set;
 
-import token.Token.Symbol;
+import token.Token.Name;
 import utils.IStack;
 import utils.Stack;
 import utils.Utils;
 
+/**
+ * Scanner responsible for lexical analysis to transform a raw input text into a stream of tokens.
+ */
 public class Scanner {
 
     private String rawText;
     private ArrayList<Token> tokens;
-    private int line, position;
+    private int line;
+    private int position;
     private boolean finished, hasError;
-    private static final Set<Character> BLANKS = Set.of('\n', '\r', '\t', ' ');
+    private IStack<Token.Name> bracketsStack;
 
-    private IStack<Token.Symbol> brackets;
-    private static final Token.Symbol[] LBRACKETS = {Symbol.LPAREN, Symbol.LBOXBRACKET, Symbol.LBRACE};
-    private static final Token.Symbol[] RBRACKETS = {Symbol.RPAREN, Symbol.RBOXBRACKET, Symbol.RBRACE};
+    public Scanner() {
+        this("");
+    }
 
     public Scanner(String text) {
         reset(text);
     }
 
-    public void reset(String text) {
+    public Scanner reset(String text) {
         this.rawText = text;
         this.tokens = new ArrayList<>();
         this.line = 0;
         this.position = 0;
         this.finished = false;
         this.hasError = false;
-        this.brackets = new Stack<>();
+        this.bracketsStack = new Stack<>();
+        return this;
     }
     
     public ArrayList<Token> tokenize() {
+
+        // get all tokens
         while (!isFinished())
             advance();
 
-        if (!brackets.isEmpty()) {
+        // if brackets stack is not empty in the end, we have an unclosed bracket
+        if (!bracketsStack.isEmpty()) {
             addErrorToken("Mismatched Brackets");
         }
 
         // append end of line token if no error has occured
         if (!hasError())
-            tokens.add(new Token(Symbol.EOF, "EOF", null, line));
+            tokens.add(new Token(Name.EOF, "EOF", null, line));
 
 		return tokens;
     }
@@ -55,20 +62,20 @@ public class Scanner {
         if (isFinished())
             return;
 
-        Token token = getToken();
+        Token token = consumeToken();
         updateBracketsStack(token);
 
-        if (!hasError() && token.SYMBOL != Symbol.COMMENT) {
+        if (!hasError() && token.NAME != Name.COMMENT) {
             tokens.add(token);
         }
     }
 
-    private Token getToken() {
+    private Token consumeToken() {
         boolean expectString = (rawText.charAt(position) == '\"');
 
         // Find next token
 		int end = -1;
-		for (Token.Symbol t : Token.Symbol.values()) {
+		for (Token.Name t : Token.Name.values()) {
 			end = t.endOfMatch(rawText.substring(position));
 			if (end != -1) {
 				Token token = new Token(t, rawText.substring(position, position + end), null, line);
@@ -84,32 +91,32 @@ public class Scanner {
 	}
 
     private void updateBracketsStack(Token currToken) {
-        Token.Symbol s = currToken.SYMBOL;
+        Token.Name s = currToken.NAME;
 
         // push left bracket
-        if (Utils.contains(LBRACKETS, s)) {
-            brackets.push(s);
+        if (Utils.contains(Token.LBRACKETS, s)) {
+            bracketsStack.push(s);
             return;
         }
 
         // pop bracket if right bracket found, must match
-        int i = Utils.indexOf(RBRACKETS, s);
+        int i = Utils.indexOf(Token.RBRACKETS, s);
         if (i != -1) {
-            if (brackets.isEmpty() || brackets.pop() != LBRACKETS[i]) {
+            if (bracketsStack.isEmpty() || bracketsStack.pop() != Token.LBRACKETS[i]) {
                 addErrorToken("Mismatched Brackets");
             }
         }
     }
 
     private Token addErrorToken(String msg) {
-        Token token = new Token(Token.Symbol.ERROR, String.format("Line %d: %s", line+1, msg), null, line);
+        Token token = new Token(Token.Name.ERROR, String.format("Line %d: %s", line+1, msg), null, line);
         tokens.add(token);
         hasError = true;
         return token;
     }
 
     private void skipBlanks() {
-        while (!isFinished() && BLANKS.contains(rawText.charAt(position))) {
+        while (!isFinished() && Token.BLANKS.contains(rawText.charAt(position))) {
 			char c = rawText.charAt(position);
             position++;
 			if (c == '\n') line++;

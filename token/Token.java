@@ -1,17 +1,22 @@
 package token;
 
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Token {
+
+    public static final Set<Character> BLANKS = Set.of('\n', '\r', '\t', ' ');
+    public static final Token.Name[] LBRACKETS = {Name.LPAREN, Name.LBOXBRACKET, Name.LBRACE};
+    public static final Token.Name[] RBRACKETS = {Name.RPAREN, Name.RBOXBRACKET, Name.RBRACE};
     
     public final String LEXEME;
-    public final Token.Symbol SYMBOL;
+    public final Token.Name NAME;
     public final int LINE;
     public final Object LITERAL;
 
-    public Token(Token.Symbol symbol, String lexeme, Object literal, int line) {
-        this.SYMBOL = symbol;
+    public Token(Token.Name name, String lexeme, Object literal, int line) {
+        this.NAME = name;
         this.LEXEME = lexeme;
         this.LINE = line;
         this.LITERAL = literal;
@@ -19,22 +24,24 @@ public class Token {
 
     @Override
     public String toString() {
-        return String.format("<%s, %s> Literal: %s, Line: %d", SYMBOL.TYPE, LEXEME, LITERAL, LINE);
+        return String.format("<%s, %s> Literal: %s, Line: %d", NAME.TYPE, LEXEME, LITERAL, LINE);
     }
 
     public static enum Type {
-        OPERATOR,
+        RELOP, // relational operator
+        ARMOP, // arithmetic operator
+        ASSOP, // assignment operator
         SPECIAL,
         KEYWORD,
-        STRING,
-        NUMBER,
-        IDENTIFIER,
-        NULL
+        STR,
+        NUM,
+        ID,
+        COM
     }
 
-    public static enum Symbol {
+    public static enum Name {
 
-        COMMENT("//[^\n]*", Type.NULL), // single line
+        COMMENT("//[^\n]*", Type.COM), // single line
 
         LPAREN("\\(", Type.SPECIAL),
 	    RPAREN("\\)", Type.SPECIAL),
@@ -44,20 +51,22 @@ public class Token {
 	    RBRACE("\\}", Type.SPECIAL),
         SEMICOLON(";", Type.SPECIAL),
         
-        LEQ("<=", Type.OPERATOR),
-        GEQ(">=", Type.OPERATOR),
-        LESS("<", Type.OPERATOR),
-        GREATER(">", Type.OPERATOR),
-        ADD("\\+", Type.OPERATOR),
-        SUB("-", Type.OPERATOR),
-        MULT("\\*", Type.OPERATOR),
-        DIV("/", Type.OPERATOR),
-        EQ("==", Type.OPERATOR),
-        NEQ("!=", Type.OPERATOR),
-        OR("or|\\|\\|", Type.OPERATOR),
-        AND("and|&&", Type.OPERATOR),
-        NOT("!|not", Type.OPERATOR),
-        ASSIGN("=", Type.OPERATOR),
+        ADD("\\+", Type.ARMOP),
+        SUB("-", Type.ARMOP),
+        MULT("\\*", Type.ARMOP),
+        DIV("/", Type.ARMOP),
+
+        LEQ("<=", Type.RELOP),
+        GEQ(">=", Type.RELOP),
+        LESS("<", Type.RELOP),
+        GREATER(">", Type.RELOP),
+        EQ("==", Type.RELOP),
+        NEQ("!=", Type.RELOP),
+        OR("or|\\|\\|", Type.RELOP),
+        AND("and|&&", Type.RELOP),
+        NOT("!|not", Type.RELOP),
+
+        ASSIGN("=", Type.ASSOP),
 
         TRUE("true", Type.KEYWORD),
         FALSE("false", Type.KEYWORD),
@@ -67,17 +76,17 @@ public class Token {
         ELSE("else", Type.KEYWORD),
         WHILE("while", Type.KEYWORD),
 
-        NUM("\\d*\\.{0,1}\\d+", Type.NUMBER), // integer or decimal
-        STR("\"[^\"]*\"", Type.STRING),
-        ID("\\w+", Type.IDENTIFIER), // identifier
+        NUM("\\d*\\.{0,1}\\d+", Type.NUM), // integer or decimal
+        STR("\"[^\"]*\"", Type.STR),
+        ID("\\w+", Type.ID), // identifier
 
-        EOF("\\A(?!x)x", Type.NULL), // end of file
-        ERROR("\\A(?!x)x", Type.NULL);
+        EOF("\\A(?!x)x", Type.COM), // end of file
+        ERROR("\\A(?!x)x", Type.COM);
     
         public final Pattern PATTERN;
         public final Token.Type TYPE;
 
-        private Symbol(String regex, Token.Type type) {
+        private Name(String regex, Token.Type type) {
             this.PATTERN = Pattern.compile("^(?i)" + regex);
             // the ^ requires the regex to match at the start of the string, for efficiency
             // the (?i) makes our language case insensitive
