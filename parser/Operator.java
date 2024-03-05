@@ -1,9 +1,5 @@
 package parser;
 
-import java.util.HashMap;
-
-import scanner.Token;
-
 public class Operator {
     public static final int ARITHMETIC = 0, LOGICAL = 1, ASSIGN = 2;
     public static final int BINARY = 0, UNARY_PREFIX = 1, UNARY_POSTFIX = 2;

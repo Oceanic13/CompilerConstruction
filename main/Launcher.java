@@ -10,7 +10,7 @@ public class Launcher {
     
     public static void main(String[] args)
     {
-        String raw = Utils.loadSPL("spl/print.spl");
+        String raw = Utils.loadSPL("spl/0.spl");
         ArrayList<Token> tokens = new Scanner(raw).tokenize();
 
 

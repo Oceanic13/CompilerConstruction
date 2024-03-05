@@ -1,23 +1,18 @@
 package scanner;
 
-import java.util.HashMap;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 public class Token {
-
-    public static final Set<Character> BLANKS = Set.of('\n', '\r', '\t', ' ');
-    public static final Token.Name[] LBRACKETS = {Name.LPAREN, Name.LBOXBRACKET, Name.LBRACE};
-    public static final Token.Name[] RBRACKETS = {Name.RPAREN, Name.RBOXBRACKET, Name.RBRACE};
     
     public final String LEXEME;
-    public final Token.Name NAME;
+    public final Token.Type TYPE;
     public final int LINE;
     public final Object LITERAL;
 
-    public Token(Token.Name name, String lexeme, Object literal, int line) {
-        this.NAME = name;
+    public Token(Token.Type type, char lexeme, Object literal, int line) {
+        this(type, ""+lexeme, literal, line);
+    }
+
+    public Token(Token.Type type, String lexeme, Object literal, int line) {
+        this.TYPE = type;
         this.LEXEME = lexeme;
         this.LINE = line;
         this.LITERAL = literal;
@@ -25,19 +20,57 @@ public class Token {
 
     @Override
     public String toString() {
-        return String.format("<%s, %s> Literal: %s, Line: %d", NAME.TYPE, LEXEME, LITERAL, LINE);
+        return String.format("<%s, %s> Literal: %s, Line: %d", TYPE, LEXEME, LITERAL, LINE);
     }
 
     public static enum Type {
-        OP, // binary operator
-        SPECIAL,
-        KEYWORD,
-        STR,
-        NUM,
-        ID,
-        COM
+
+        COMMENT,
+
+        LPAREN,
+	    RPAREN,
+	    //LBOXBRACKET,
+	    //RBOXBRACKET,
+        LBRACE,
+	    RBRACE,
+        SEMICOLON,
+        
+        ADD,
+        SUB,
+        MULT,
+        DIV,
+
+        LEQ,
+        GEQ,
+        LESS,
+        GREATER,
+        EQ,
+        NEQ,
+        OR,
+        AND,
+        NOT,
+
+        ASSIGN,
+
+        TRUE,
+        FALSE,
+        VAR,
+        PRINT,
+        IF,
+        ELSE,
+        WHILE,
+
+        INTEGER, // integer
+        DECIMAL,
+        STR, // string
+        ID, // identifier
+
+        EOF, // end of file
+        ERROR;
     }
 
+    /*
+    @Deprecated
     public static enum Name {
 
         COMMENT("//[^\n]*", Type.COM), // single line
@@ -75,9 +108,9 @@ public class Token {
         ELSE("else", Type.KEYWORD),
         WHILE("while", Type.KEYWORD),
 
-        FLOAT("\\d*\\.{0,1}\\d+", Type.NUM), // float
         INT("\\d+", Type.NUM), // integer
-        STR("\"[^\"]*\"", Type.STR),
+        FLOAT("\\d*\\.{0,1}\\d+", Type.NUM), // float
+        STR("\"[^\"]*\"", Type.STR), // string
         ID("\\w+", Type.ID), // identifier
 
         EOF("\\A(?!x)x", Type.COM), // end of file
@@ -93,18 +126,13 @@ public class Token {
             this.TYPE = type;
         }
 
-        /**
-         * Returns the first character position in the given String
-         * it no longer matches the pattern of the Token or -1 if they don't match
-         * at all or the start of the match is not the first index.
-         * @param str String to match
-         * @return End of Match
-         */
         public int endOfMatch(String str) {
             Matcher matcher = PATTERN.matcher(str);
-            return matcher.find()&&matcher.start()==0? matcher.end() : -1;
+            if (!matcher.find()) return -1;
+            assert(matcher.start() == 0);
+            return matcher.end();
         }
     }
-
+    */
     
 }

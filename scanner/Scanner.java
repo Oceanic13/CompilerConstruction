@@ -1,23 +1,32 @@
 package scanner;
 
 import java.util.ArrayList;
+import java.util.Map;
+import static java.util.Map.entry;  
 
-import scanner.Token.Name;
-import utils.IStack;
 import utils.Stack;
-import utils.Utils;
 
 /**
  * Scanner responsible for lexical analysis to transform a raw input text into a stream of tokens.
  */
 public class Scanner {
 
-    private String rawText;
+    
+    private static final Map<String, Token.Type> KEYWORDS = Map.ofEntries(
+        entry("true", Token.Type.TRUE),
+        entry("false", Token.Type.FALSE),
+        entry("var", Token.Type.VAR),
+        entry("print", Token.Type.PRINT),
+        entry("if", Token.Type.IF),
+        entry("else", Token.Type.ELSE),
+        entry("while", Token.Type.WHILE)
+    );
+
+    private String input;
     private ArrayList<Token> tokens;
     private int line;
-    private int position;
-    private boolean finished, hasError;
-    private IStack<Token.Name> bracketsStack;
+    private int index;
+    private Stack<Character> bracketsStack;
 
     public Scanner() {
         this("");
@@ -28,107 +37,147 @@ public class Scanner {
     }
 
     public Scanner reset(String text) {
-        this.rawText = text;
+        this.input = text;
         this.tokens = new ArrayList<>();
-        this.line = 0;
-        this.position = 0;
-        this.finished = false;
-        this.hasError = false;
         this.bracketsStack = new Stack<>();
+        this.line = 0;
+        this.index = 0;
         return this;
     }
     
     public ArrayList<Token> tokenize() {
 
-        // get all tokens
-        while (!isFinished())
-            advance();
+        System.out.println(input);
 
-        // if brackets stack is not empty in the end, we have an unclosed bracket
-        if (!bracketsStack.isEmpty()) {
-            addErrorToken("Mismatched Brackets");
+        // get all tokens
+        while (!isAtEnd()) {
+            int start = index;
+            char c = advance();
+
+            switch (c) {
+                // whitespace
+                case '\r':
+                case '\t':
+                case ' ': break;
+
+                // newline
+                case '\n': line++; break;
+
+                // brackets
+                case '{':
+                    addToken(Token.Type.LBRACE, c, null);
+                    bracketsStack.push('{');
+                    break;
+                case '}':
+                    addToken(Token.Type.RBRACE, c, null);
+                    if (bracketsStack.isEmpty() || bracketsStack.pop() != '{') {
+                        System.err.println("Mismatched Brackets!");
+                        System.exit(1);
+                    }
+                    break;
+                case '(':
+                    addToken(Token.Type.LPAREN, c, null);
+                    bracketsStack.push('(');
+                    break;
+                case ')':
+                    addToken(Token.Type.RPAREN, c, null);
+                    if (bracketsStack.isEmpty() || bracketsStack.pop() != '(') {
+                        System.err.println("Mismatched Brackets!");
+                        System.exit(1);
+                    }
+                    break;
+
+                // other single character symbols
+                case ';': addToken(Token.Type.SEMICOLON, c, null); break;
+                case '+': addToken(Token.Type.ADD, c, null); break;
+                case '-': addToken(Token.Type.SUB, c, null); break;
+                case '*': addToken(Token.Type.MULT, c, null); break;
+
+                // single character symbols that are prefixes of longer token types
+                case '<': if (match('=')) {addToken(Token.Type.LEQ, "<=", null);} else {addToken(Token.Type.LESS, '<', null);} break;
+                case '>': if (match('=')) {addToken(Token.Type.GEQ, ">=", null);} else {addToken(Token.Type.GREATER, '>', null);} break;
+                case '=': if (match('=')) {addToken(Token.Type.EQ, "==", null);} else {addToken(Token.Type.ASSIGN, '=', null);} break;
+                case '!': if (match('=')) {addToken(Token.Type.NEQ, "!=", null);} else {addToken(Token.Type.NOT, '!', null);} break;
+                
+                case '/': if (match('/')) {while(peek()!='\n'&&!isAtEnd()) advance();} else {addToken(Token.Type.DIV, '/', null);} break;
+
+                // strings
+                case '\"':
+                    while (peek() != '\"' && !isAtEnd()) {advance();}
+                    if (isAtEnd()) {
+                        System.err.println("Undeterminated String!");
+                        System.exit(1);
+                    }
+                    advance();
+                    String str = input.substring(start+1, index-1);
+                    addToken(Token.Type.STR, str, null);
+                    break;
+
+                default:
+                    // keywords or identifiers
+                    if (isAlpha(c)) {
+                        while (isAlpha(peek()) || isDigit(peek())) {advance();}
+                        String word = input.substring(start, index);
+
+                        Token.Type type = KEYWORDS.getOrDefault(word, Token.Type.ID);
+                        addToken(type, word, null);
+                        break;
+                    }
+                    // numbers
+                    if (isDigit(c)) {
+                        while (isDigit(peek())) {advance();}
+                        boolean isDecimal = match('.');
+                        if (isDecimal) {while (isDigit(peek())) {advance();}}
+                        addToken(isDecimal? Token.Type.DECIMAL : Token.Type.INTEGER, input.substring(start, index), null);
+                    }
+
+                    break;
+                
+            }
         }
 
-        // append end of line token if no error has occured
-        if (!hasError())
-            tokens.add(new Token(Name.EOF, "EOF", null, line));
+        if (!bracketsStack.isEmpty()) {
+            System.err.println("Mismatched Brackets!");
+            System.exit(1);
+        }
 
+        addToken(Token.Type.EOF, '\0', null);
 		return tokens;
     }
 
-    private void advance() {
-        
-        skipBlanks();
-        if (isFinished())
-            return;
-
-        Token token = consumeToken();
-        updateBracketsStack(token);
-
-        if (!hasError() && token.NAME != Name.COMMENT) {
-            tokens.add(token);
-        }
+    private boolean isAlpha(char c) {
+        return (c>='a'&&c<='z')||(c>='A'&&c<='Z');
     }
 
-    private Token consumeToken() {
-        boolean expectString = (rawText.charAt(position) == '\"');
-
-        // Find next token
-		int end = -1;
-		for (Token.Name t : Token.Name.values()) {
-			end = t.endOfMatch(rawText.substring(position));
-			if (end != -1) {
-				Token token = new Token(t, rawText.substring(position, position + end), null, line);
-				position += end;
-				return token;
-			}
-		}
-
-        // No match - Error
-        hasError = true;
-        if (expectString) return addErrorToken("Unclosed String");
-        return addErrorToken("Unexpected Token");
-	}
-
-    private void updateBracketsStack(Token currToken) {
-        Token.Name s = currToken.NAME;
-
-        // push left bracket
-        if (Utils.contains(Token.LBRACKETS, s)) {
-            bracketsStack.push(s);
-            return;
-        }
-
-        // pop bracket if right bracket found, must match
-        int i = Utils.indexOf(Token.RBRACKETS, s);
-        if (i != -1) {
-            if (bracketsStack.isEmpty() || bracketsStack.pop() != Token.LBRACKETS[i]) {
-                addErrorToken("Mismatched Brackets");
-            }
-        }
+    private boolean isDigit(char c) {
+        return (c>='0'&&c<='9');
     }
 
-    private Token addErrorToken(String msg) {
-        Token token = new Token(Token.Name.ERROR, String.format("Line %d: %s", line+1, msg), null, line);
-        tokens.add(token);
-        hasError = true;
-        return token;
+    private char advance() {
+        if (isAtEnd()) return '\0';
+        return input.charAt(index++);
     }
 
-    private void skipBlanks() {
-        while (!isFinished() && Token.BLANKS.contains(rawText.charAt(position))) {
-			char c = rawText.charAt(position);
-            position++;
-			if (c == '\n') line++;
-		}
+    private boolean match(char expected) {
+        if (isAtEnd() || peek() != expected) return false;
+        index++;
+        return true;
     }
 
-    private boolean isFinished() {
-        this.finished = finished || hasError || position >= rawText.length();
-        return finished;
+    private char peek() {
+        if (isAtEnd()) return '\0';
+        return input.charAt(index);
     }
 
-    public boolean hasError() {
-        return hasError;
+    private boolean isAtEnd() {
+        return index >= input.length();
+    }
+
+    private void addToken(Token.Type type, char lexeme, Object literal) {
+        tokens.add(new Token(type, lexeme, literal, line));
+    }
+
+    private void addToken(Token.Type type, String lexeme, Object literal) {
+        tokens.add(new Token(type, lexeme, literal, line));
     }
 }
