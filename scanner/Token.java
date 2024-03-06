@@ -65,6 +65,7 @@ public class Token {
         STR, // string
         ID, // identifier
 
+        NULL,
         EOF, // end of file
         ERROR;
     }
