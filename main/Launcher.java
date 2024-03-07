@@ -13,7 +13,6 @@ public class Launcher {
         String raw = Utils.loadSPL("spl/0.spl");
         ArrayList<Token> tokens = new Scanner(raw).tokenize();
 
-
-        System.out.println(tokens.toString());
+        System.out.println(Utils.collectionToString(tokens, '\n'));
     }
 }

@@ -2,14 +2,10 @@ package test;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.ArrayList;
-
 import org.junit.Test;
 
 import scanner.DFA;
-import scanner.Scanner;
 import scanner.Token;
-import utils.Utils;
 
 public class DFATests {
 

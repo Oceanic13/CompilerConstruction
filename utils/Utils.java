@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collection;
 
 public class Utils
 {
@@ -21,35 +22,26 @@ public class Utils
         return -1;
     }
 
+    /**
+     * Returns the first line index on which there is a brackets mismatch or -1 if there is no mismatch.
+     * @param str input text
+     * @return line index of brackets mismatch
+     */
+    private static final String BRACKETS = "{}()[]";
     public static int findBracketsMismatch(String str)
     {
         int line = 0;
         Stack<Character> stack = new Stack<>();
-
         for (char s : str.toCharArray()) {
-            switch (s) {
-                case '\n':
-                    line++;
-                    break;
-                case '[':
-                case '{':
-                case '(':
-                    stack.push(s);
-                    break;
-                case '}':
-                    if (stack.isEmpty() || stack.pop() != '{')
+            if (s == '\n') {line++; continue;}
+            for (int i = 0; i < BRACKETS.length()/2; ++i) {
+                if (s == BRACKETS.charAt(2*i)) {stack.push(s); break;} //left bracket
+                if (s == BRACKETS.charAt(2*i+1)) { // right bracket
+                    if (stack.isEmpty() || stack.pop() != BRACKETS.charAt(2*i)) {
                         return line;
+                    }
                     break;
-                case ']':
-                    if (stack.isEmpty() || stack.pop() != '[')
-                        return line;
-                    break;
-                case ')':
-                    if (stack.isEmpty() || stack.pop() != '(')
-                        return line;
-                    break;
-                default:
-                    break;
+                }
             }
         }
         return stack.isEmpty()? -1 : line;
@@ -62,5 +54,18 @@ public class Utils
             e.printStackTrace();
         }
         return "";
+    }
+
+    public static <E> String collectionToString(Collection<E> collection, char delimeter) {
+        return collectionToString(collection, ""+delimeter);
+    }
+
+    public static <E> String collectionToString(Collection<E> collection, String delimeter) {
+        StringBuilder b = new StringBuilder();
+        for (E e : collection) {
+            b.append(e);
+            b.append(delimeter);
+        }
+        return b.toString();
     }
 }

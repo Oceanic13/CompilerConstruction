@@ -1,8 +1,6 @@
 package scanner;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.function.Predicate;
 
 public class DFA {
