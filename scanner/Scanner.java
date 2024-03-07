@@ -28,6 +28,7 @@ public class Scanner {
         entry('+', Token.Type.ADD),
         entry('-', Token.Type.SUB),
         entry('*', Token.Type.MULT),
+        entry('^', Token.Type.POW),
         entry(';', Token.Type.SEMICOLON)
     );
 
@@ -109,7 +110,7 @@ public class Scanner {
         }
         advance();
         String str = input.substring(start+1, index-1);
-        addToken(Token.Type.STR, str, null);
+        addToken(Token.Type.STR, str, str);
     }
 
     private void scanAlphaNumeric(int start) {
@@ -123,9 +124,15 @@ public class Scanner {
     private void scanNumber(int start) {
         assert(isDigit(input.charAt(start)));
         while (isDigit(peek())) {advance();}
-        boolean isDecimal = match('.');
-        if (isDecimal) {while (isDigit(peek())) {advance();}}
-        addToken(isDecimal? Token.Type.DECIMAL : Token.Type.INTEGER, input.substring(start, index), null);
+        String s;
+        if (match('.')) {
+            while (isDigit(peek())) {advance();}
+            s = input.substring(start, index);
+            addToken(Token.Type.DEC, s, Double.parseDouble(s));
+            return;
+        }
+        s = input.substring(start, index);
+        addToken(Token.Type.INT, s, Integer.parseInt(s));
     }
 
     private boolean isAlpha(char c) {

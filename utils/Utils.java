@@ -27,9 +27,8 @@ public class Utils
      * @param str input text
      * @return line index of brackets mismatch
      */
-    private static final String BRACKETS = "{}()[]";
-    public static int findBracketsMismatch(String str)
-    {
+    public static int findBracketsMismatch(String str) {
+        final String BRACKETS = "{}()[]";
         int line = 0;
         Stack<Character> stack = new Stack<>();
         for (char s : str.toCharArray()) {
