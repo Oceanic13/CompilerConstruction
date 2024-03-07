@@ -3,6 +3,9 @@ package scanner;
 import java.util.ArrayList;
 import java.util.function.Predicate;
 
+import scanner.Token.Type;
+import utils.Pair;
+
 public class DFA {
 
     public static final Predicate<Character> IS_BLANK = c -> (c == ' ' || c == '\t' || c == '\r');
@@ -20,8 +23,16 @@ public class DFA {
         this.start = state;
     }
 
-    public Token.Type accept(String s) {
-        if (s.isEmpty()) return Token.Type.NULL;
+    /*
+     * Returns the token type corresponding to the given input text up
+     * until the returned index
+     * 
+     * For example: "32.5abc" returns <DECIMAL, 4>
+     * 
+     * If there is no match, returns <NULL, 0>
+     */
+    public Pair<Token.Type, Integer> endOfMatch(String s) {
+        if (s.isEmpty()) return new Pair<>(Token.Type.NULL, 0);
         int index = 0;
         char c = '\0';
         State curr = null;
@@ -32,9 +43,16 @@ public class DFA {
             next = curr.next(c);
             index++;
         }
-        if (next == null) return Token.Type.NULL;
 
-        return next.TYPE;
+        if (next == null) {
+            if (curr == null) {
+                return new Pair<>(Token.Type.NULL, 0);
+            } else {
+                return new Pair<>(curr.TYPE, curr.TYPE==Type.NULL? 0 : index-1);
+            }
+        }
+
+        return new Pair<>(next.TYPE, next.TYPE==Type.NULL? 0 : index);
     }
 
     public static class State {
