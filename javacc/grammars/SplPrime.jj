@@ -1,0 +1,4 @@
+PARSER_BEGIN(SPLPrime)
+    public class SPLPrime{ }
+PARSER\_END(SPLPrime)
+
