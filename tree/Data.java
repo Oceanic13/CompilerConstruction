@@ -7,7 +7,7 @@ public class Data {
     public enum DataType {
         NUMBER, BOOLEAN, STRING
     }
-
+    
     private DataType type;
     private byte[] b;
 

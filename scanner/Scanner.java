@@ -17,7 +17,8 @@ public class Scanner {
         entry("print", Token.Type.PRINT),
         entry("if", Token.Type.IF),
         entry("else", Token.Type.ELSE),
-        entry("while", Token.Type.WHILE)
+        entry("while", Token.Type.WHILE),
+        entry("for", Token.Type.FOR)
     );
 
     private static final Map<Character, Token.Type> CHARS = Map.ofEntries(
@@ -87,6 +88,9 @@ public class Scanner {
             // Strings
             if (c == '\"') {scanString(start); continue;}
 
+            // Characters
+            if (c == '\'') {scanCharacter(start); continue;}
+
             // Keywords or Identifiers
             if (isAlpha(c)) {scanAlphaNumeric(start); continue;}
 
@@ -99,6 +103,17 @@ public class Scanner {
 
         addToken(Token.Type.EOF, '\0', null);
 		return tokens;
+    }
+
+    private void scanCharacter(int start) {
+        assert(input.charAt(start) == '\'');
+        //match('\\'); TODO: Handle escape sequence characters
+        advance();
+        if (!match('\'')) {
+            System.err.println("Malformed Character!");
+        }
+        String s = input.substring(start+1, index-1);
+        addToken(Token.Type.CHAR, s, s.charAt(s.length()-1));
     }
 
     private void scanString(int start) {

@@ -25,13 +25,13 @@ public class Token {
 
     public static enum Type {
         COMMENT,
+
         LPAREN,
 	    RPAREN,
-	    //LBOXBRACKET,
-	    //RBOXBRACKET,
         LBRACE,
 	    RBRACE,
         SEMICOLON,
+
         ADD,
         SUB,
         MULT,
@@ -47,6 +47,7 @@ public class Token {
         AND,
         NOT,
         ASSIGN,
+
         TRUE,
         FALSE,
         VAR,
@@ -54,10 +55,15 @@ public class Token {
         IF,
         ELSE,
         WHILE,
+        FOR,
+
         INT,
         DEC,
         STR,
+        CHAR,
+
         ID,
+
         NULL,
         EOF;
     }
