@@ -1,10 +1,12 @@
 package tree;
 
-public abstract class Expr implements IExpr {
+import utils.Data;
 
-    protected IExpr[] children;
+public abstract class Expr extends Node {
 
-    public Expr(IExpr...children) {
-        this.children = children;
+    public Expr(Program program) {
+        super(program);
     }
+
+    public abstract Data eval();
 }

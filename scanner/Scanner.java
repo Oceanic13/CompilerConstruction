@@ -18,7 +18,8 @@ public class Scanner {
         entry("if", Token.Type.IF),
         entry("else", Token.Type.ELSE),
         entry("while", Token.Type.WHILE),
-        entry("for", Token.Type.FOR)
+        entry("for", Token.Type.FOR),
+        entry("func", Token.Type.FUNC)
     );
 
     private static final Map<Character, Token.Type> CHARS = Map.ofEntries(
@@ -26,11 +27,14 @@ public class Scanner {
         entry('}', Token.Type.RBRACE),
         entry('(', Token.Type.LPAREN),
         entry(')', Token.Type.RPAREN),
+        entry('[', Token.Type.LBOXBRACKET),
+        entry(']', Token.Type.RBOXBRACKET),
         entry('+', Token.Type.ADD),
         entry('-', Token.Type.SUB),
         entry('*', Token.Type.MULT),
         entry('^', Token.Type.POW),
-        entry(';', Token.Type.SEMICOLON)
+        entry(';', Token.Type.SEMICOLON),
+        entry(',', Token.Type.COMMA)
     );
 
     private String input;
@@ -94,7 +98,7 @@ public class Scanner {
             // Keywords or Identifiers
             if (isAlpha(c)) {scanAlphaNumeric(start); continue;}
 
-            // Numbers
+            // Numbers (Ints and Decimals)
             if (isDigit(c)) {scanNumber(start); continue;}
 
             System.err.println("Unexpected Token: " + c);
@@ -107,13 +111,12 @@ public class Scanner {
 
     private void scanCharacter(int start) {
         assert(input.charAt(start) == '\'');
-        //match('\\'); TODO: Handle escape sequence characters
-        advance();
+        char c = advance();
         if (!match('\'')) {
-            System.err.println("Malformed Character!");
+            System.err.println("Undeterminated Character!");
+            System.exit(1);
         }
-        String s = input.substring(start+1, index-1);
-        addToken(Token.Type.CHAR, s, s.charAt(s.length()-1));
+        addToken(Token.Type.CHAR, c, c);
     }
 
     private void scanString(int start) {

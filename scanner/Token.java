@@ -30,7 +30,10 @@ public class Token {
 	    RPAREN,
         LBRACE,
 	    RBRACE,
+        LBOXBRACKET,
+        RBOXBRACKET,
         SEMICOLON,
+        COMMA,
 
         ADD,
         SUB,
@@ -56,6 +59,7 @@ public class Token {
         ELSE,
         WHILE,
         FOR,
+        FUNC,
 
         INT,
         DEC,

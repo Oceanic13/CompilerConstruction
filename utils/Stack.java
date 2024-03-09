@@ -1,6 +1,6 @@
 package utils;
 
-public class Stack<E> implements IStack<E> {
+public class Stack<E> {
 
     private StackElement top;
     private int size;
@@ -10,17 +10,14 @@ public class Stack<E> implements IStack<E> {
         this.size = 0;
     }
 
-    @Override
     public boolean isEmpty() {
         return size==0;
     }
 
-    @Override
     public int size() {
         return size;
     }
 
-    @Override
     public void push(E item) {
         StackElement t = top;
         top = new StackElement();
@@ -29,13 +26,11 @@ public class Stack<E> implements IStack<E> {
         size++;
     }
 
-    @Override
     public E top() {
         assert(!isEmpty());
         return top.item;
     }
 
-    @Override
     public E pop() {
         assert(!isEmpty());
         StackElement t = top;
