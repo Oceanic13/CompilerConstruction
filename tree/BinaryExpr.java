@@ -9,7 +9,7 @@ public class BinaryExpr extends Expr {
     protected Expr left, right;
     protected BinaryOperator<Data> func;
 
-    public BinaryExpr(Program program, BinaryOperator<Data> func, Expr left, Expr right) {
+    protected BinaryExpr(Program program, BinaryOperator<Data> func, Expr left, Expr right) {
         super(program);
         this.func = func;
         this.left = left;
@@ -20,6 +20,5 @@ public class BinaryExpr extends Expr {
     public Data eval() {
         return func.apply(left.eval(), right.eval());
     }
-
     
 }

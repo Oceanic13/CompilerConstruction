@@ -11,10 +11,13 @@ public class VarExpr extends Expr {
         this.varIndex = varIndex;
     }
 
+    public int varIndex() {
+        return varIndex;
+    }
+
     @Override
     public Data eval() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'eval'");
+        return PROGRAM.varData(varIndex);
     }
     
 }

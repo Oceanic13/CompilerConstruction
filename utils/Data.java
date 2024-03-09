@@ -2,33 +2,139 @@ package utils;
 
 public abstract class Data {
 
-    public static boolean asBool(boolean v) {return v;}
-    public static boolean asBool(int v) {return v != 0;}
-    public static boolean asBool(double v) {return v != 0.;}
-    public static boolean asBool(char v) {return v != ' ';}
-    public static boolean asBool(String v) {return v.length() > 0;}
+    public abstract boolean asBool();
+    public abstract int asInt();
+    public abstract double asDec();
+    public abstract char asChar();
+    public abstract String asStr();
 
-    public static int asInt(boolean v) {return v? 1 : 0;}
-    public static int asInt(int v) {return v;}
-    public static int asInt(double v) {return (int)v;}
-    public static int asInt(char v) {return v;}
-    public static int asInt(String v) {return v.length();}
+    public static class Bool extends Data {
+        private boolean value;
+        public Bool(boolean value) {this.value = value;}
 
-    public static double asDec(boolean v) {return v? 1. : 0.;}
-    public static double asDec(int v) {return v;}
-    public static double asDec(double v) {return v;}
-    public static double asDec(char v) {return v;}
-    public static double asDec(String v) {return v.length();}
+        @Override
+        public boolean asBool() {
+            return value;
+        }
+        @Override
+        public int asInt() {
+            return value? 1 : 0;
+        }
+        @Override
+        public double asDec() {
+            return value? 1. : 0.;
+        }
+        @Override
+        public char asChar() {
+            return value? '1' : '0';
+        }
+        @Override
+        public String asStr() {
+            return value? "true" : "false";
+        }
+    }
 
-    public static String asStr(boolean v) {return v? "true" : "false";}
-    public static String asStr(int v) {return ""+v;}
-    public static String asStr(double v) {return ""+v;}
-    public static String asStr(char v) {return ""+v;}
-    public static String asStr(String v) {return v;}
+    public static class Int extends Data {
+        private int value;
+        public Int(int value) {this.value = value;}
 
-    public static char asChar(boolean v) {return v? '1' : '0';}
-    public static char asChar(int v) {return (char)v;}
-    public static char asChar(double v) {return (char)v;}
-    public static char asChar(char v) {return v;}
-    public static char asChar(String v) {return v.charAt(0);}
+        @Override
+        public boolean asBool() {
+            return value != 0;
+        }
+        @Override
+        public int asInt() {
+            return value;
+        }
+        @Override
+        public double asDec() {
+            return value;
+        }
+        @Override
+        public char asChar() {
+            return (char)value;
+        }
+        @Override
+        public String asStr() {
+            return ""+value;
+        }
+    }
+
+    public static class Dec extends Data {
+        private double value;
+        public Dec(double value) {this.value = value;}
+
+        @Override
+        public boolean asBool() {
+            return value != 0.;
+        }
+        @Override
+        public int asInt() {
+            return (int)value;
+        }
+        @Override
+        public double asDec() {
+            return value;
+        }
+        @Override
+        public char asChar() {
+            return (char)value;
+        }
+        @Override
+        public String asStr() {
+            return ""+value;
+        }
+    }
+
+    public static class Char extends Data {
+        private char value;
+        public Char(char value) {this.value = value;}
+
+        @Override
+        public boolean asBool() {
+            return value != '0';
+        }
+        @Override
+        public int asInt() {
+            return value;
+        }
+        @Override
+        public double asDec() {
+            return value;
+        }
+        @Override
+        public char asChar() {
+            return value;
+        }
+        @Override
+        public String asStr() {
+            return ""+value;
+        }
+    }
+
+    public static class Str extends Data {
+        private String value;
+        public Str(String value) {this.value = value;}
+
+        @Override
+        public boolean asBool() {
+            return value.length() > 0;
+        }
+        @Override
+        public int asInt() {
+            return value.length();
+        }
+        @Override
+        public double asDec() {
+            return value.length();
+        }
+        @Override
+        public char asChar() {
+            return (value.length()>0)? value.charAt(0) : '\0';
+        }
+        @Override
+        public String asStr() {
+            return value;
+        }
+    }
 }
