@@ -31,11 +31,13 @@ public class BooleanType extends DataType<Boolean> {
         return new BooleanType(!value);
     }
 
-    public BooleanType add(BooleanType o) {
+    public BooleanType or(BooleanType o) {
         return new BooleanType(value || o.value);
     }
 
-    public BooleanType mult(BooleanType o) {
+    public BooleanType and(BooleanType o) {
         return new BooleanType(value && o.value);
     }
+
+
 }

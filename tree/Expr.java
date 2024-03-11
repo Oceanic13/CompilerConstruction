@@ -8,5 +8,5 @@ public abstract class Expr extends Node {
     public Expr() {
     }
 
-    public abstract DataType eval(Context context);
+    public abstract DataType<?> eval(Context context);
 }

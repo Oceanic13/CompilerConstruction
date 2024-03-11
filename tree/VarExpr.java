@@ -17,7 +17,7 @@ public class VarExpr extends Expr {
     }
 
     @Override
-    public DataType eval(Context context) {
+    public DataType<?> eval(Context context) {
         return context.varData(varIndex);
     }
     

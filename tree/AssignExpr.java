@@ -10,7 +10,7 @@ public class AssignExpr extends BinaryExpr {
     }
 
     @Override
-    public DataType eval(Context context) {
+    public DataType<?> eval(Context context) {
         var r = super.eval(context);
         context.setVarData(((VarExpr)(left)).varIndex(), r);
         return r;

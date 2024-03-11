@@ -17,4 +17,12 @@ public abstract class DataType<T> {
     public T value() {
         return value;
     }
+
+    public BooleanType eq(DataType<T> o) {
+        return new BooleanType(value.equals(o.value));
+    }
+
+    public BooleanType neq(DataType<T> o) {
+        return eq(o).not();
+    }
 }

@@ -26,4 +26,12 @@ public class CharacterType extends DataType<Character> {
     public StringType asStr() {
         return new StringType(""+value);
     }
+
+    public StringType add(CharacterType o) {
+        return new StringType("" + value + o.value);
+    }
+
+    public StringType mult(IntegerType o) {
+        return new StringType(new StringBuilder().repeat(value, Math.abs(o.value)).toString());
+    }
 }
