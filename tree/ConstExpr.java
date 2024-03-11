@@ -1,20 +1,20 @@
 package tree;
 
+import main.Context;
 import utils.Data;
 
 public class ConstExpr extends Expr {
 
     protected Data value;
 
-    public ConstExpr(Program program, Data value) {
-        super(program);
+    public ConstExpr(Data value) {
+        super();
         this.value = value;
     }
 
     @Override
-    public Data eval() {
+    public Data eval(Context context) {
         return value;
     }
-    
     
 }

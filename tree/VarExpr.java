@@ -1,13 +1,14 @@
 package tree;
 
+import main.Context;
 import utils.Data;
 
 public class VarExpr extends Expr {
 
     protected int varIndex;
 
-    public VarExpr(Program program, int varIndex) {
-        super(program);
+    public VarExpr(int varIndex) {
+        super();
         this.varIndex = varIndex;
     }
 
@@ -16,8 +17,8 @@ public class VarExpr extends Expr {
     }
 
     @Override
-    public Data eval() {
-        return PROGRAM.varData(varIndex);
+    public Data eval(Context context) {
+        return context.varData(varIndex);
     }
     
 }

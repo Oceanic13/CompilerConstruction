@@ -1,12 +1,13 @@
-package tree;
+package main;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import tree.Node;
 import utils.Data;
 import utils.Pair;
 
-public class Program {
+public class Context {
     
     private Node root;
     private ArrayList<Pair<String, Data>> variables;

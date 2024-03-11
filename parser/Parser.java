@@ -3,6 +3,7 @@ package parser;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import main.Context;
 import scanner.NullToken;
 import scanner.Token;
 import scanner.Token.Type;
@@ -11,7 +12,6 @@ import tree.AssignExpr;
 import tree.Expr;
 import tree.Node;
 import tree.NullNode;
-import tree.Program;
 import tree.VarExpr;
 import utils.Stack;
 
@@ -22,7 +22,7 @@ public class Parser {
     private ArrayList<Token> tokens;
     private int index;
     private Stack<Token.Type> bracketsStack;
-    private Program program;
+    private Context program;
 
     public Parser() {
         this(new ArrayList<>(Arrays. asList(new Token(Token.Type.EOF, "", null, 0))));
@@ -36,7 +36,7 @@ public class Parser {
         this.tokens = tokens;
         this.index = 0;
         this.bracketsStack = new Stack<>();
-        this.program = new Program();
+        this.program = new Context();
         return this;
     }
 
@@ -54,12 +54,13 @@ public class Parser {
         return NullNode.get();
     }
 
+
     public BinaryExpr parseAssignment() {
-        advance(Token.Type.VAR);
-        Token left = advance(Token.Type.ID);
-        advance(Token.Type.ASSIGN);
+        eat(Token.Type.VAR);
+        Token left = eat(Token.Type.ID);
+        eat(Token.Type.ASSIGN);
         Expr right = parseExpression();
-        return new AssignExpr(program, new VarExpr(program, program.varIndex(left.LEXEME)), right);
+        return new AssignExpr(new VarExpr(program.varIndex(left.LEXEME)), right);
     }
 
     public Expr parseExpression() {
@@ -85,7 +86,7 @@ public class Parser {
         return t;
     }
 
-    private Token advance(Token.Type expected) {
+    private Token eat(Token.Type expected) {
         if (peek() != expected) {
             System.err.printf("Unexpected Token. Expected %s but got %s\n", expected, peek());
             return NullToken.get();

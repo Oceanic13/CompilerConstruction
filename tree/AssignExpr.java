@@ -1,17 +1,18 @@
 package tree;
 
+import main.Context;
 import utils.Data;
 
 public class AssignExpr extends BinaryExpr {
 
-    public AssignExpr(Program program, VarExpr left, Expr right) {
-        super(program, (x,y)->y, left, right);
+    public AssignExpr(VarExpr left, Expr right) {
+        super((x,y)->y, left, right);
     }
 
     @Override
-    public Data eval() {
-        var r = super.eval();
-        PROGRAM.setVarData(((VarExpr)(left)).varIndex(), r);
+    public Data eval(Context context) {
+        var r = super.eval(context);
+        context.setVarData(((VarExpr)(left)).varIndex(), r);
         return r;
     }
 }
