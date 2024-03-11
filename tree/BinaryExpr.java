@@ -3,14 +3,14 @@ package tree;
 import java.util.function.BinaryOperator;
 
 import main.Context;
-import utils.Data;
+import structs.DataType;
 
 public class BinaryExpr extends Expr {
 
     protected Expr left, right;
-    protected BinaryOperator<Data> func;
+    protected BinaryOperator<DataType> func;
 
-    protected BinaryExpr(BinaryOperator<Data> func, Expr left, Expr right) {
+    protected BinaryExpr(BinaryOperator<DataType> func, Expr left, Expr right) {
         super();
         this.func = func;
         this.left = left;
@@ -18,7 +18,7 @@ public class BinaryExpr extends Expr {
     }
 
     @Override
-    public Data eval(Context context) {
+    public DataType eval(Context context) {
         return func.apply(left.eval(context), right.eval(context));
     }
     

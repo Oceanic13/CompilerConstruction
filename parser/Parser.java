@@ -1,5 +1,6 @@
 package parser;
 
+import java.beans.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -10,6 +11,7 @@ import scanner.Token.Type;
 import tree.BinaryExpr;
 import tree.AssignExpr;
 import tree.Expr;
+import tree.IfStatement;
 import tree.Node;
 import tree.NullNode;
 import tree.VarExpr;
@@ -54,12 +56,12 @@ public class Parser {
         return NullNode.get();
     }
 
-
     public BinaryExpr parseAssignment() {
         eat(Token.Type.VAR);
         Token left = eat(Token.Type.ID);
         eat(Token.Type.ASSIGN);
         Expr right = parseExpression();
+        eat(Token.Type.SEMICOLON);
         return new AssignExpr(new VarExpr(program.varIndex(left.LEXEME)), right);
     }
 

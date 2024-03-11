@@ -18,7 +18,7 @@ public class ForStatement extends Statement {
     @Override
     public void execute(Context context) {
         initialization.execute(context);
-        while(!termination.eval(context).asBool()) {
+        while(!termination.eval(context).asBool().value()) {
             increment.execute(context);
         }
     }

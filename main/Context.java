@@ -3,17 +3,17 @@ package main;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import structs.DataType;
 import tree.Node;
-import utils.Data;
 import utils.Pair;
 
 public class Context {
     
     private Node root;
-    private ArrayList<Pair<String, Data>> variables;
+    private ArrayList<Pair<String, DataType>> variables;
     private HashMap<String, Integer> variablesIndices;
 
-    public void setVarData(int varIndex, Data data) {
+    public void setVarData(int varIndex, DataType data) {
         variables.get(varIndex).second = data;
     }
 
@@ -25,7 +25,7 @@ public class Context {
         return variables.get(i).first;
     }
 
-    public Data varData(int i) {
+    public DataType varData(int i) {
         return variables.get(i).second;
     }
 }

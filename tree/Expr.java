@@ -1,12 +1,12 @@
 package tree;
 
 import main.Context;
-import utils.Data;
+import structs.DataType;
 
 public abstract class Expr extends Node {
 
     public Expr() {
     }
 
-    public abstract Data eval(Context context);
+    public abstract DataType eval(Context context);
 }

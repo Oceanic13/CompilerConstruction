@@ -1,7 +1,7 @@
 package tree;
 
 import main.Context;
-import utils.Data;
+import structs.DataType;
 
 public class VarExpr extends Expr {
 
@@ -17,7 +17,7 @@ public class VarExpr extends Expr {
     }
 
     @Override
-    public Data eval(Context context) {
+    public DataType eval(Context context) {
         return context.varData(varIndex);
     }
     
