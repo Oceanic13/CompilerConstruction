@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 import org.junit.Test;
 
-import scanner.Scanner;
+import scanner.Lexer;
 import scanner.Token;
 import utils.Utils;
 
@@ -15,7 +15,7 @@ public class ScannerTests {
     @Test
     public void testScanner0() {
         String raw = Utils.loadSPL("spl/0.spl");
-        Scanner scanner = new Scanner(raw);
+        Lexer scanner = new Lexer(raw);
         ArrayList<Token> tokens = scanner.tokenize();
         int n = tokens.size();
 
@@ -29,7 +29,7 @@ public class ScannerTests {
 
     @Test
     public void testScannerSimple0() {
-        Scanner scanner = new Scanner("var b = true;");
+        Lexer scanner = new Lexer("var b = true;");
         ArrayList<Token> tokens = scanner.tokenize();
         int n = tokens.size();
         assertEquals(6, n);

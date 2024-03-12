@@ -12,7 +12,7 @@ public class IfStatement extends Statement {
         super();
         this.ifSequence = ifSequence;
         this.elseIf = elseIf;
-        this.ifCondition = ifCondition;
+        this.ifCondition = ifCondition; 
     }
 
     @Override

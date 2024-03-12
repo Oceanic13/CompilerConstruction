@@ -1,5 +1,6 @@
 package main;
 
+import java.beans.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -9,9 +10,24 @@ import utils.Pair;
 
 public class Context {
     
-    private Node root;
+    private Context parent;
+    private ArrayList<Context> children;
+    private Statement[] sequence;
     private ArrayList<Pair<String, DataType<?>>> variables;
     private HashMap<String, Integer> variablesIndices;
+
+    public Context(Statement[] sequence) {
+        this.children = new ArrayList<>();
+        this.sequence = sequence;
+    }
+
+    public Context addChildren(Context...cs) {
+        for (var c : cs) {
+            children.add(c);
+            c.parent = this;
+        }
+        return this;
+    }
 
     public void setVarData(int varIndex, DataType<?> data) {
         variables.get(varIndex).second = data;

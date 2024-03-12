@@ -8,7 +8,7 @@ import static java.util.Map.entry;
 /**
  * Scanner responsible for lexical analysis to transform a raw input text into a stream of tokens.
  */
-public class Scanner {
+public class Lexer {
     
     private static final Map<String, Token.Type> KEYWORDS = Map.ofEntries(
         entry("true", Token.Type.TRUE),
@@ -42,15 +42,15 @@ public class Scanner {
     private int line;
     private int index;
 
-    public Scanner() {
+    public Lexer() {
         this("");
     }
 
-    public Scanner(String text) {
+    public Lexer(String text) {
         reset(text);
     }
 
-    public Scanner reset(String text) {
+    public Lexer reset(String text) {
         this.input = text;
         this.tokens = new ArrayList<>();
         this.line = 0;

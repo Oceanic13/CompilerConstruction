@@ -6,7 +6,7 @@ public class PrintStatement extends Statement {
 
     private Expr expr;
 
-    private PrintStatement(Expr expr) {
+    public PrintStatement(Expr expr) {
         super();
         this.expr = expr;
     }

@@ -1,6 +1,5 @@
 package parser;
 
-import java.beans.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -11,10 +10,16 @@ import scanner.Token.Type;
 import tree.BinaryExpr;
 import tree.AssignExpr;
 import tree.Expr;
+import tree.ForStatement;
+import tree.Statement;
 import tree.IfStatement;
 import tree.Node;
+import tree.NullExpr;
 import tree.NullNode;
+import tree.NullStatement;
+import tree.PrintStatement;
 import tree.VarExpr;
+import tree.WhileStatement;
 import utils.Stack;
 
 public class Parser {
@@ -42,32 +47,96 @@ public class Parser {
         return this;
     }
 
-    public Node parse() {
-        while (!isAtEnd()) {
-            int start = index;
-            Token token = advance();
-        }
+    public Context parse() {
+        var context = parseProgram();
 
         if (!bracketsStack.isEmpty()) {
             System.err.println("Brackets mismatch!");
             System.exit(1);
         }
 
-        return NullNode.get();
+        return context;
     }
 
-    public BinaryExpr parseAssignment() {
+    public Context parseProgram() {
+        return new Context(parseBlock());
+    }
+
+    public Statement parseStatement() {
+        switch (peek()) {
+            case Token.Type.VAR: return parseVarDeclaration();
+            case Token.Type.IF: return parseIfStatement();
+            case Token.Type.WHILE: return parseWhileStatement();
+            case Token.Type.FOR: return parseForStatement();
+            case Token.Type.PRINT: return parsePrintStatement();
+            default: return parseExpression();
+        }
+    }
+
+    public AssignExpr parseVarDeclaration() {
         eat(Token.Type.VAR);
         Token left = eat(Token.Type.ID);
-        eat(Token.Type.ASSIGN);
-        Expr right = parseExpression();
+
+        Expr right = NullExpr.get();
+        if (match(Token.Type.ASSIGN)) {
+            right = parseExpression();
+        }
         eat(Token.Type.SEMICOLON);
+
         return new AssignExpr(new VarExpr(program.varIndex(left.LEXEME)), right);
+    }
+
+    public IfStatement parseIfStatement() {
+        eat(Token.Type.IF);
+        eat(Token.Type.LPAREN);
+        var condition = parseExpression();
+        eat(Token.Type.RPAREN);
+        var s = new Statement[] {parseStatement()};
+
+        return new IfStatement(condition, s, null);
+    }
+
+    public WhileStatement parseWhileStatement() {
+        eat(Token.Type.WHILE);
+        eat(Token.Type.LPAREN);
+        var condition = parseExpression();
+        eat(Token.Type.RPAREN);
+        var s = new Statement[] {parseStatement()};
+
+        return new WhileStatement(condition, s);
+    }
+
+    public ForStatement parseForStatement() {
+        eat(Token.Type.FOR);
+        eat(Token.Type.LPAREN);
+        var initialization = parseStatement();
+        eat(Token.Type.SEMICOLON);
+        var termination = parseExpression();
+        eat(Token.Type.SEMICOLON);
+        var increment = parseStatement();
+        eat(Token.Type.RPAREN);
+        var sequence = new Statement[] {parseStatement()};
+
+        return new ForStatement(initialization, termination, increment, sequence);
+    }
+
+    public PrintStatement parsePrintStatement() {
+        eat(Token.Type.PRINT);
+        return new PrintStatement(parseExpression());
+    }
+
+    public Statement[] parseBlock() {
+        eat(Token.Type.LBRACE);
+        var sequence = new ArrayList<Statement>();
+        while (peek() != Token.Type.RBRACE) {
+            sequence.add(parseStatement());
+        }
+        eat(Token.Type.RBRACE);
+        return sequence.toArray(new Statement[sequence.size()]);
     }
 
     public Expr parseExpression() {
         //TODO
-        return null;
     }
     
     private Token advance() {
