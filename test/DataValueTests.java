@@ -80,6 +80,15 @@ public class DataValueTests {
     }
 
     @Test
+    public void testNumMinusNum() {
+        DataValue.init();
+        var i = new DataValue<>(10);
+        var d = new DataValue<>(5.5);
+        assertEquals(4.5, i.apply(Token.Type.SUB, d).value());
+        assertEquals(-4.5, d.apply(Token.Type.SUB, i).value());
+    }
+
+    @Test
     public void testIntPlusInt() {
         DataValue.init();
         var a = new DataValue<>(12);

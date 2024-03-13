@@ -48,10 +48,28 @@ public class DataValue<A> {
         //defTypeCast(String.class, Character.class, x -> x.charAt(0));
         defTypeCast(String.class, String.class, x -> x);
 
+        // Logical operations
         defOp(Token.Type.NOT, Boolean.class, Boolean.class, x->!x);
+        defSymmetricOp(Token.Type.AND, Boolean.class, Boolean.class, Boolean.class, (x,y) -> x&&y);
+        defSymmetricOp(Token.Type.OR, Boolean.class, Boolean.class, Boolean.class, (x,y) -> x||y);
 
+        // Numeric, arithmetic operations
         defSymmetricOp(Token.Type.ADD, Integer.class, Integer.class, Integer.class, (x,y) -> x+y);
+        defSymmetricOp(Token.Type.ADD, Double.class, Double.class, Double.class, (x,y) -> x+y);
         defSymmetricOp(Token.Type.ADD, Integer.class, Double.class, Double.class, (x,y) -> x+y);
+        defOp(Token.Type.SUB, Integer.class, Integer.class, Integer.class, (x,y) -> x-y);
+        defOp(Token.Type.SUB, Integer.class, Double.class, Double.class, (x,y) -> x-y);
+        defOp(Token.Type.SUB, Double.class, Integer.class, Double.class, (x,y) -> x-y);
+        defOp(Token.Type.SUB, Double.class, Double.class, Double.class, (x,y) -> x-y);
+        defSymmetricOp(Token.Type.MULT, Integer.class, Integer.class, Integer.class, (x,y) -> x*y);
+        defSymmetricOp(Token.Type.MULT, Double.class, Double.class, Double.class, (x,y) -> x*y);
+        defSymmetricOp(Token.Type.MULT, Integer.class, Double.class, Double.class, (x,y) -> x*y);
+        defOp(Token.Type.DIV, Integer.class, Integer.class, Integer.class, (x,y) -> x/y);
+        defOp(Token.Type.DIV, Integer.class, Double.class, Double.class, (x,y) -> x/y);
+        defOp(Token.Type.DIV, Double.class, Integer.class, Double.class, (x,y) -> x/y);
+        defOp(Token.Type.DIV, Double.class, Double.class, Double.class, (x,y) -> x/y);
+
+        defSymmetricOp(Token.Type.ADD, Integer.class, String.class, String.class, (x,y) -> x+y);
 
         defOp(Token.Type.SUB, String.class, Character.class, String.class, (x,y) -> x.replaceAll(""+y, ""));
         defOp(Token.Type.SUB, String.class, String.class, String.class, (x,y) -> x.replaceAll(y, ""));
