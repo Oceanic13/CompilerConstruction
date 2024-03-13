@@ -1,7 +1,7 @@
 package tree;
 
 import main.Context;
-import structs.DataType;
+import structs.DataValue;
 
 public class NullExpr extends Expr {
 
@@ -12,7 +12,7 @@ public class NullExpr extends Expr {
     }
 
     @Override
-    public DataType<?> eval(Context context) {
+    public DataValue<?> eval(Context context) {
         return null;
     }
     

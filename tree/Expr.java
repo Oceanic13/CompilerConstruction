@@ -1,14 +1,14 @@
 package tree;
 
 import main.Context;
-import structs.DataType;
+import structs.DataValue;
 
 public abstract class Expr extends Statement {
 
     public Expr() {
     }
 
-    public abstract DataType<?> eval(Context context);
+    public abstract DataValue<?> eval(Context context);
 
     @Override
     public void execute(Context context) {

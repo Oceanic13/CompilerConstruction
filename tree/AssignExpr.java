@@ -1,7 +1,7 @@
 package tree;
 
 import main.Context;
-import structs.DataType;
+import structs.DataValue;
 
 public class AssignExpr extends BinaryExpr {
 
@@ -10,7 +10,7 @@ public class AssignExpr extends BinaryExpr {
     }
 
     @Override
-    public DataType<?> eval(Context context) {
+    public DataValue<?> eval(Context context) {
         var r = super.eval(context);
         context.setVarData(((VarExpr)(left)).varIndex(), r);
         return r;

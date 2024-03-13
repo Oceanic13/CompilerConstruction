@@ -7,16 +7,12 @@ import main.Context;
 import scanner.NullToken;
 import scanner.Token;
 import scanner.Token.Type;
-import tree.BinaryExpr;
 import tree.AssignExpr;
 import tree.Expr;
 import tree.ForStatement;
 import tree.Statement;
 import tree.IfStatement;
-import tree.Node;
 import tree.NullExpr;
-import tree.NullNode;
-import tree.NullStatement;
 import tree.PrintStatement;
 import tree.VarExpr;
 import tree.WhileStatement;
@@ -29,7 +25,7 @@ public class Parser {
     private ArrayList<Token> tokens;
     private int index;
     private Stack<Token.Type> bracketsStack;
-    private Context program;
+    private Context context;
 
     public Parser() {
         this(new ArrayList<>(Arrays. asList(new Token(Token.Type.EOF, "", null, 0))));
@@ -43,7 +39,6 @@ public class Parser {
         this.tokens = tokens;
         this.index = 0;
         this.bracketsStack = new Stack<>();
-        this.program = new Context();
         return this;
     }
 
@@ -59,6 +54,9 @@ public class Parser {
     }
 
     public Context parseProgram() {
+        this.context = new Context();
+        var sequence = parseBlock();
+        for (var s : sequence) context.addStatement(s);
         return new Context(parseBlock());
     }
 
@@ -83,7 +81,7 @@ public class Parser {
         }
         eat(Token.Type.SEMICOLON);
 
-        return new AssignExpr(new VarExpr(program.varIndex(left.LEXEME)), right);
+        return new AssignExpr(new VarExpr(context.varIndex(left.LEXEME)), right);
     }
 
     public IfStatement parseIfStatement() {
@@ -137,6 +135,7 @@ public class Parser {
 
     public Expr parseExpression() {
         //TODO
+        return null;
     }
     
     private Token advance() {

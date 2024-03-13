@@ -20,7 +20,7 @@ public class ForStatement extends Statement {
     @Override
     public void execute(Context context) {
         initialization.execute(context);
-        while(!termination.eval(context).asBool().value()) {
+        while(!termination.eval(context).cast(Boolean.class).value()) {
 
             for (var s : sequence) {
                 s.execute(context);

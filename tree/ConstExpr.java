@@ -1,19 +1,19 @@
 package tree;
 
 import main.Context;
-import structs.DataType;
+import structs.DataValue;
 
 public class ConstExpr extends Expr {
 
-    protected DataType<?> value;
+    protected DataValue<?> value;
 
-    public ConstExpr(DataType<?> value) {
+    public ConstExpr(DataValue<?> value) {
         super();
         this.value = value;
     }
 
     @Override
-    public DataType<?> eval(Context context) {
+    public DataValue<?> eval(Context context) {
         return value;
     }
     

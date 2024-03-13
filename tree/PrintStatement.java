@@ -13,6 +13,6 @@ public class PrintStatement extends Statement {
 
     @Override
     public void execute(Context context) {
-        System.out.println(expr.eval(context).asStr().value());
+        System.out.println(expr.eval(context).cast(String.class).value());
     }
 }

@@ -17,11 +17,11 @@ public class IfStatement extends Statement {
 
     @Override
     public void execute(Context context) {
-        if (ifCondition.eval(context).asBool().value()) {
+        if (ifCondition.eval(context).cast(Boolean.class).value()) {
             for (var s : ifSequence) {
                 s.execute(context);
             }
-        } else if (elseIf != null && elseIf.ifCondition.eval(context).asBool().value()) {
+        } else if (elseIf != null && elseIf.ifCondition.eval(context).cast(Boolean.class).value()) {
             for (var s : elseIf.ifSequence) {
                 s.execute(context);
             }

@@ -15,7 +15,7 @@ public class WhileStatement extends Statement {
 
     @Override
     public void execute(Context context) {
-        while (condition.eval(context).asBool().value()) {
+        while (condition.eval(context).cast(Boolean.class).value()) {
             for (var s : sequence) {
                 s.execute(context);
             }
