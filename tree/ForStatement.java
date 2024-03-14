@@ -1,6 +1,6 @@
 package tree;
 
-import main.Context;
+import main.Program;
 import utils.DataType;
 
 public class ForStatement extends Statement {
@@ -8,24 +8,22 @@ public class ForStatement extends Statement {
     private Statement initialization;
     private Expr termination;
     private Statement increment;
-    private Statement[] sequence;
+    private MultiStatement sequence;
 
     public ForStatement(Statement initialization, Expr termination, Statement increment, Statement[] sequence) {
         super();
         this.initialization = initialization;
         this.termination = termination;
         this.increment = increment;
-        this.sequence = sequence;   
+        this.sequence = new MultiStatement(sequence);   
     }
 
     @Override
-    public void execute(Context context) {
+    public void execute(Program context) {
         initialization.execute(context);
         while(!DataType.cast(termination.eval(context), Boolean.class)) {
 
-            for (var s : sequence) {
-                s.execute(context);
-            }
+            sequence.execute(context);
 
             increment.execute(context);
         }

@@ -1,32 +1,27 @@
 package tree;
 
-import main.Context;
+import main.Program;
 import utils.DataType;
 
 public class IfStatement extends Statement {
 
-    private Statement[] ifSequence;
+    private MultiStatement ifSequence;
     private Expr ifCondition;
     private IfStatement elseIf;
 
     public IfStatement(Expr ifCondition, Statement[] ifSequence, IfStatement elseIf) {
         super();
-        this.ifSequence = ifSequence;
+        this.ifSequence = new MultiStatement(ifSequence);
         this.elseIf = elseIf;
         this.ifCondition = ifCondition; 
     }
 
     @Override
-    public void execute(Context context) {
+    public void execute(Program context) {
         if (DataType.cast(ifCondition.eval(context), Boolean.class)) {
-            for (var s : ifSequence) {
-                s.execute(context);
-            }
+            ifSequence.execute(context);
         } else if (elseIf != null && DataType.cast(elseIf.ifCondition.eval(context), Boolean.class)) {
-            for (var s : elseIf.ifSequence) {
-                s.execute(context);
-            }
+            elseIf.ifSequence.execute(context);
         }
     }
-    
 }

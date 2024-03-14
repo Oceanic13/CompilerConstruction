@@ -1,6 +1,6 @@
 package tree;
 
-import main.Context;
+import main.Program;
 import scanner.Token;
 import utils.DataType;
 
@@ -16,8 +16,12 @@ public class UnaryExpr extends Expr {
     }
 
     @Override
-    public Object eval(Context context) {
+    public Object eval(Program context) {
         return DataType.apply1(type, child.eval(context));
     }
     
+    @Override
+    public String toString() {
+        return String.format("<%s %s>", type, child);
+    }
 }

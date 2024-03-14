@@ -1,6 +1,6 @@
 package tree;
 
-import main.Context;
+import main.Program;
 
 public class VarExpr extends Expr {
 
@@ -16,8 +16,12 @@ public class VarExpr extends Expr {
     }
 
     @Override
-    public Object eval(Context context) {
-        return context.varData(varIndex);
+    public Object eval(Program context) {
+        return context.getVarValue(varIndex);
     }
     
+    @Override
+    public String toString() {
+        return String.format("<VAR:%d>", varIndex);
+    }
 }

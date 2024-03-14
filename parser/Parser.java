@@ -3,7 +3,7 @@ package parser;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import main.Context;
+import main.Program;
 import scanner.NullToken;
 import scanner.Token;
 import scanner.Token.Type;
@@ -25,7 +25,7 @@ public class Parser {
     private ArrayList<Token> tokens;
     private int index;
     private Stack<Token.Type> bracketsStack;
-    private Context context;
+    private Program context;
 
     public Parser() {
         this(new ArrayList<>(Arrays. asList(new Token(Token.Type.EOF, "", null, 0))));
@@ -42,7 +42,7 @@ public class Parser {
         return this;
     }
 
-    public Context parse() {
+    public Program parse() {
         var context = parseProgram();
 
         if (!bracketsStack.isEmpty()) {
@@ -53,11 +53,11 @@ public class Parser {
         return context;
     }
 
-    public Context parseProgram() {
-        this.context = new Context();
+    public Program parseProgram() {
+        this.context = new Program();
         var sequence = parseBlock();
         for (var s : sequence) context.addStatement(s);
-        return new Context(parseBlock());
+        return new Program(parseBlock());
     }
 
     public Statement parseStatement() {

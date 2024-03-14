@@ -1,6 +1,6 @@
 package tree;
 
-import main.Context;
+import main.Program;
 import scanner.Token;
 
 public class AssignExpr extends BinaryExpr {
@@ -10,9 +10,14 @@ public class AssignExpr extends BinaryExpr {
     }
 
     @Override
-    public Object eval(Context context) {
+    public Object eval(Program context) {
         var r = right.eval(context);
-        context.setVarData(((VarExpr)(left)).varIndex(), r);
+        context.setVarValue(((VarExpr)(left)).varIndex(), r);
         return r;
+    }
+
+    @Override
+    public void execute(Program context) {
+        eval(context);
     }
 }

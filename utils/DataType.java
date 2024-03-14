@@ -54,6 +54,7 @@ public abstract class DataType {
         defOp(Token.Type.NOT, Boolean.class, Boolean.class, x->!x);
         defSymmetricOp(Token.Type.AND, Boolean.class, Boolean.class, Boolean.class, (x,y) -> x&&y);
         defSymmetricOp(Token.Type.OR, Boolean.class, Boolean.class, Boolean.class, (x,y) -> x||y);
+        defOp(Token.Type.LESS, Integer.class, Integer.class, Boolean.class, (x,y) -> x<y);
 
         // Numeric, arithmetic operations
         defSymmetricOp(Token.Type.ADD, Integer.class, Integer.class, Integer.class, (x,y) -> x+y);
@@ -108,6 +109,15 @@ public abstract class DataType {
         defOp(type, I2, I1, O, (x,y) -> f.apply(y,x));
     }
 
+    /**
+     * Transforms a given value into the specified class if a corresponding
+     * typecast has been defined.
+     * @param <A> Type of from
+     * @param <B> Type of to
+     * @param from Some Object
+     * @param to Class to cast to
+     * @return Castes Object
+     */
     public static <A,B> B cast(A from, Class<B> to) {
         var tc1 = TYPECASTS.getOrDefault(from.getClass(), null);
         if (tc1 != null) {

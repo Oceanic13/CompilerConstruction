@@ -1,6 +1,6 @@
 package tree;
 
-import main.Context;
+import main.Program;
 
 public class ConstExpr extends Expr {
 
@@ -12,7 +12,7 @@ public class ConstExpr extends Expr {
     }
 
     @Override
-    public Object eval(Context context) {
+    public Object eval(Program context) {
         return value;
     }
     

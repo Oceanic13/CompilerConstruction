@@ -1,6 +1,6 @@
 package tree;
 
-import main.Context;
+import main.Program;
 
 public class NullExpr extends Expr {
 
@@ -11,12 +11,17 @@ public class NullExpr extends Expr {
     }
 
     @Override
-    public Object eval(Context context) {
+    public Object eval(Program context) {
         return null;
     }
     
     public static NullExpr get() {
         if (instance == null) instance = new NullExpr();
         return instance;
+    }
+
+    @Override
+    public String toString() {
+        return "<NULLEXPR>";
     }
 }

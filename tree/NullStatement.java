@@ -1,6 +1,6 @@
 package tree;
 
-import main.Context;
+import main.Program;
 
 public class NullStatement extends Statement {
     
@@ -11,12 +11,17 @@ public class NullStatement extends Statement {
     }
 
     @Override
-    public void execute(Context context) {
+    public void execute(Program context) {
         // Do nothing
     }
 
     public static NullStatement get() {
         if (instance == null) instance = new NullStatement();
         return instance;
+    }
+
+    @Override
+    public String toString() {
+        return "<NULLSTATEMENT>";
     }
 }

@@ -1,6 +1,6 @@
 package tree;
 
-import main.Context;
+import main.Program;
 
 public abstract class Statement extends Node {
 
@@ -8,6 +8,6 @@ public abstract class Statement extends Node {
         super();
     }
     
-    public abstract void execute(Context context);
+    public abstract void execute(Program context);
 
 }

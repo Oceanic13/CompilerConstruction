@@ -1,16 +1,16 @@
 package tree;
 
-import main.Context;
+import main.Program;
 
 public abstract class Expr extends Statement {
 
     public Expr() {
     }
 
-    public abstract Object eval(Context context);
+    public abstract Object eval(Program context);
 
     @Override
-    public void execute(Context context) {
+    public void execute(Program context) {
         // Do nothing
     }
 }
