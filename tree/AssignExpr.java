@@ -11,7 +11,7 @@ public class AssignExpr extends BinaryExpr {
 
     @Override
     public Object eval(Context context) {
-        var r = super.eval(context);
+        var r = right.eval(context);
         context.setVarData(((VarExpr)(left)).varIndex(), r);
         return r;
     }

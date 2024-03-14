@@ -1,5 +1,6 @@
 package utils;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -9,6 +10,9 @@ import utils.Operation.Binary;
 import utils.Operation.Unary;
 
 public abstract class DataType {
+
+    @SuppressWarnings("unchecked")
+    public static final Class<Object[]> ARRAY_CLASS = (Class<Object[]>) new Object[]{}.getClass();
 
     private static HashMap<Class<?>, HashMap<Class<?>, TypeCast<?,?>>> TYPECASTS = new HashMap<>();
     private static HashMap<Token.Type, HashMap<Class<?>, HashMap<Class<?>, Binary<?,?,?>>>> BINARY_OPS = new HashMap<>();
@@ -69,12 +73,18 @@ public abstract class DataType {
 
         // String Number operations
         defOp(Token.Type.SUB, String.class, Integer.class, String.class, (x,y) -> x.substring(0, x.length()-y));
-        defSymmetricOp(Token.Type.ADD, Integer.class, String.class, String.class, (x,y) -> x+y);
+        defOp(Token.Type.ADD, Integer.class, String.class, String.class, (x,y) -> x+y);
+        defOp(Token.Type.ADD, String.class, Integer.class, String.class, (x,y) -> x+y);
         defSymmetricOp(Token.Type.MULT, String.class, Integer.class, String.class, (x,y) -> y>=0? x.repeat(y) : new StringBuilder(x.repeat(-y)).reverse().toString());
 
         // String String/Char operations
+        defOp(Token.Type.ADD, Character.class, Character.class, String.class, (x,y) -> ""+x+y);
         defOp(Token.Type.SUB, String.class, Character.class, String.class, (x,y) -> x.replaceAll(""+y, ""));
         defOp(Token.Type.SUB, String.class, String.class, String.class, (x,y) -> x.replaceAll(y, ""));
+    
+        // Apply operations to each element of array
+        defSymmetricOp(Token.Type.ADD, ARRAY_CLASS, Integer.class, ARRAY_CLASS, (x,y) -> Arrays.stream(x)
+        .map(i->DataType.apply2(Token.Type.ADD, i, y)).toArray());
     }
     
     public static <A,B> void defTypeCast(Class<A> T1, Class<B> T2, Function<A, B> cast) {
@@ -110,6 +120,15 @@ public abstract class DataType {
         throw new ClassCastException(String.format("No Cast defined from %s to %s!", from.getClass().getSimpleName(), to.getSimpleName()));
     }
 
+    /**
+     * Applies a given unary operator to an object and returns the result.
+     * @param <A> Type of lhs
+     * @param <B> Type of result
+     * @param type Operator
+     * @param v Object
+     * @return result
+     * @throws UnsupportedOperationException
+     */
     public static <A,B> B apply1(Token.Type type, A v) {
         var t = UNARY_OPS.getOrDefault(type, null);
         if (t != null) {
@@ -122,6 +141,17 @@ public abstract class DataType {
         throw new UnsupportedOperationException(String.format("No Unary Operation %s defined for %s!", type.name(), v.getClass().getSimpleName()));
     }
 
+    /**
+     * Applies a given binary operator to two object and returns the result.
+     * @param <A> Type of lhs
+     * @param <B> Type of rhs
+     * @param <C> Type of result
+     * @param type Operator
+     * @param lhs Left hand side
+     * @param rhs Right hand side
+     * @return
+     * @throws UnsupportedOperationException
+     */
     public static <A,B,C> C apply2(Token.Type type, A lhs, B rhs) {
         var t1 = BINARY_OPS.getOrDefault(type, null);
         if (t1 != null) {

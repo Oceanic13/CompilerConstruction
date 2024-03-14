@@ -81,7 +81,8 @@ public class Parser {
         }
         eat(Token.Type.SEMICOLON);
 
-        return new AssignExpr(new VarExpr(context.varIndex(left.LEXEME)), right);
+        // TODO: GET CORREXT VARIABLE INDEX
+        return new AssignExpr(new VarExpr(0), right);
     }
 
     public IfStatement parseIfStatement() {

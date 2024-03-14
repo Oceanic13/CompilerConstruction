@@ -1,5 +1,6 @@
 package test;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -123,5 +124,15 @@ public class DataValueTests {
         assertEquals("cbA", DataType.apply2(Token.Type.MULT, s, -1));
         assertEquals("AbcAbcAbc", DataType.apply2(Token.Type.MULT, s, 3));
         assertEquals("cbAcbAcbA", DataType.apply2(Token.Type.MULT, s, -3));
+    }
+
+    @Test
+    public void testArrayPlusInt() {
+        DataType.init();
+
+        var arr = new Object[] {10, 0.5, "Abc"};
+        var exp = new Object[] {13, 3.5, "Abc3"};
+
+        assertArrayEquals(exp, DataType.apply2(Token.Type.ADD, arr, 3));
     }
 }
