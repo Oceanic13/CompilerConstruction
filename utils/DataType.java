@@ -1,23 +1,21 @@
-package structs;
+package utils;
 
 import java.util.HashMap;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import scanner.Token;
-import utils.TypeCast;
 import utils.Operation.Binary;
 import utils.Operation.Unary;
 
-public class DataValue<A> {
-
-    private A v;
+public abstract class DataType {
 
     private static HashMap<Class<?>, HashMap<Class<?>, TypeCast<?,?>>> TYPECASTS = new HashMap<>();
     private static HashMap<Token.Type, HashMap<Class<?>, HashMap<Class<?>, Binary<?,?,?>>>> BINARY_OPS = new HashMap<>();
     private static HashMap<Token.Type, HashMap<Class<?>, Unary<?,?>>> UNARY_OPS = new HashMap<>();
 
     public static void init() {
+
         defTypeCast(Boolean.class, Boolean.class, x -> x);
         defTypeCast(Boolean.class, Integer.class, x -> x?1:0);
         defTypeCast(Boolean.class, Double.class, x -> x?1.:0.);
@@ -69,12 +67,14 @@ public class DataValue<A> {
         defOp(Token.Type.DIV, Double.class, Integer.class, Double.class, (x,y) -> x/y);
         defOp(Token.Type.DIV, Double.class, Double.class, Double.class, (x,y) -> x/y);
 
+        // String Number operations
+        defOp(Token.Type.SUB, String.class, Integer.class, String.class, (x,y) -> x.substring(0, x.length()-y));
         defSymmetricOp(Token.Type.ADD, Integer.class, String.class, String.class, (x,y) -> x+y);
+        defSymmetricOp(Token.Type.MULT, String.class, Integer.class, String.class, (x,y) -> y>=0? x.repeat(y) : new StringBuilder(x.repeat(-y)).reverse().toString());
 
+        // String String/Char operations
         defOp(Token.Type.SUB, String.class, Character.class, String.class, (x,y) -> x.replaceAll(""+y, ""));
         defOp(Token.Type.SUB, String.class, String.class, String.class, (x,y) -> x.replaceAll(y, ""));
-
-        defSymmetricOp(Token.Type.MULT, String.class, Integer.class, String.class, (x,y) -> y>=0? x.repeat(y) : new StringBuilder(x.repeat(-y)).reverse().toString());
     }
     
     public static <A,B> void defTypeCast(Class<A> T1, Class<B> T2, Function<A, B> cast) {
@@ -98,68 +98,42 @@ public class DataValue<A> {
         defOp(type, I2, I1, O, (x,y) -> f.apply(y,x));
     }
 
-    public DataValue(DataValue<A> o) {
-        this.v = o.v;
-    }
-
-    public  DataValue(A v) {
-        this.v = v;
-    }
-
-    public A value() {
-        return v;
-    }
-
-    @SuppressWarnings("unchecked")
-    public Class<A> type() {
-        return (Class<A>) v.getClass();
-    }
-
-    public <B> DataValue<B> cast(Class<B> c2) {
-
-        var tc1 = TYPECASTS.getOrDefault(v.getClass(), null);
+    public static <A,B> B cast(A from, Class<B> to) {
+        var tc1 = TYPECASTS.getOrDefault(from.getClass(), null);
         if (tc1 != null) {
             @SuppressWarnings("unchecked")
-            var tc = (TypeCast<A,B>)tc1.getOrDefault(c2, null);
+            var tc = (TypeCast<A,B>)tc1.getOrDefault(to, null);
             if (tc != null) {
-                return new DataValue<B>(tc.apply(this.v));
+                return tc.apply(from);
             }
         }
-        throw new ClassCastException(String.format("No Cast defined from %s to %s!", this.v.getClass().getSimpleName(), c2.getSimpleName()));
+        throw new ClassCastException(String.format("No Cast defined from %s to %s!", from.getClass().getSimpleName(), to.getSimpleName()));
     }
 
-    public <B> DataValue<B> apply(Token.Type type) {
+    public static <A,B> B apply1(Token.Type type, A v) {
         var t = UNARY_OPS.getOrDefault(type, null);
         if (t != null) {
             @SuppressWarnings("unchecked")
-            var u = (Unary<A,B>)t.getOrDefault(this.v.getClass(), null);
+            var u = (Unary<A,B>)t.getOrDefault(v.getClass(), null);
             if (u != null) {
-                return new DataValue<B>(u.apply(this.v));
+                return u.apply(v);
             }
         }
-        throw new UnsupportedOperationException(String.format("No Unary Operation %s defined for %s!", type.name(), this.v.getClass().getSimpleName()));
+        throw new UnsupportedOperationException(String.format("No Unary Operation %s defined for %s!", type.name(), v.getClass().getSimpleName()));
     }
 
-    public <B,C> DataValue<C> apply(Token.Type type, DataValue<B> rhs) {
+    public static <A,B,C> C apply2(Token.Type type, A lhs, B rhs) {
         var t1 = BINARY_OPS.getOrDefault(type, null);
         if (t1 != null) {
-            var t2 = BINARY_OPS.get(type).getOrDefault(this.v.getClass(), null);
+            var t2 = BINARY_OPS.get(type).getOrDefault(lhs.getClass(), null);
             if (t2 != null) {
                 @SuppressWarnings("unchecked")
-                var b = (Binary<A,B,C>)t2.getOrDefault(rhs.v.getClass(), null);
+                var b = (Binary<A,B,C>)t2.getOrDefault(rhs.getClass(), null);
                 if (b != null) {
-                    return new DataValue<C>(b.apply(this.v, rhs.v));
+                    return b.apply(lhs, rhs);
                 }
             }
         }
-        throw new UnsupportedOperationException(String.format("No Binary Operation %s defined for %s!", type.name(), this.v.getClass().getSimpleName()));
-    }
-
-    public boolean eq(DataValue<?> o) {return v.equals(o.v);}
-    public boolean neq(DataValue<?> o) {return !eq(o);}
-
-    @Override
-    public String toString() {
-        return String.format("<%s, %s>", v.getClass().getSimpleName(), v.toString());
+        throw new UnsupportedOperationException(String.format("No Binary Operation %s defined for %s and %s!", type.name(), lhs.getClass().getSimpleName(), rhs.getClass().getSimpleName()));
     }
 }

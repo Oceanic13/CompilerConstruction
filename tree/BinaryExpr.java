@@ -1,25 +1,24 @@
 package tree;
 
-import java.util.function.BinaryOperator;
-
 import main.Context;
-import structs.DataValue;
+import scanner.Token;
+import utils.DataType;
 
 public class BinaryExpr extends Expr {
 
     protected Expr left, right;
-    protected BinaryOperator<DataValue<?>> func;
+    protected Token.Type type;
 
-    protected BinaryExpr(BinaryOperator<DataValue<?>> func, Expr left, Expr right) {
+    protected BinaryExpr(Token.Type type, Expr left, Expr right) {
         super();
-        this.func = func;
+        this.type = type;
         this.left = left;
         this.right = right;
     }
 
     @Override
-    public DataValue<?> eval(Context context) {
-        return func.apply(left.eval(context), right.eval(context));
+    public Object eval(Context context) {
+        return DataType.apply2(type, left.eval(context), right.eval(context));
     }
     
 }

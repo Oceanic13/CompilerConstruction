@@ -1,6 +1,7 @@
 package tree;
 
 import main.Context;
+import utils.DataType;
 
 public class PrintStatement extends Statement {
 
@@ -13,6 +14,6 @@ public class PrintStatement extends Statement {
 
     @Override
     public void execute(Context context) {
-        System.out.println(expr.eval(context).cast(String.class).value());
+        System.out.println(DataType.cast(expr.eval(context), String.class));
     }
 }

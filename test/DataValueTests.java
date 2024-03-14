@@ -1,126 +1,127 @@
 package test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 import org.junit.Test;
 
 import scanner.Token;
-import structs.DataValue;
+import utils.DataType;
 
 public class DataValueTests {
 
     @Test
-    public void testDataTypes() {
-        DataValue.init();
-
-        assertEquals(Boolean.class, new DataValue<>(true).type());
-        assertEquals(Integer.class, new DataValue<>(3).type());
-        assertEquals(Double.class, new DataValue<>(10.5).type());
-        assertEquals(Character.class, new DataValue<>('?').type());
-        assertEquals(String.class, new DataValue<>("Hello World").type());
+    public void testNullValue() {
+        DataType.init();
+        assertNull(null);
     }
 
     @Test
     public void testBoolCasts() {
-        DataValue.init();
+        DataType.init();
 
-        var b = new DataValue<>(true);
-        assertEquals(true, b.value());
-        assertEquals(1, b.cast(Integer.class).value().intValue());
-        assertEquals(1., b.cast(Double.class).value().doubleValue(), 0.);
-        assertEquals('1', b.cast(Character.class).value().charValue());
-        assertEquals("true", b.cast(String.class).value());
+        var b = true;
+        assertEquals(true, b);
+        assertEquals(1, DataType.cast(b, Integer.class).intValue());
+        assertEquals(1., DataType.cast(b, Double.class), 0.);
+        assertEquals('1', DataType.cast(b, Character.class).charValue());
+        assertEquals("true", DataType.cast(b, String.class));
     }
 
     @Test
     public void testIntCasts() {
-        DataValue.init();
+        DataType.init();
 
-        var i = new DataValue<>(65);
-        assertEquals(true, i.cast(Boolean.class).value());
-        assertEquals(65, i.value().intValue());
-        assertEquals(65., i.cast(Double.class).value(), 0.);
-        assertEquals('A', i.cast(Character.class).value().charValue());
-        assertEquals("65", i.cast(String.class).value());
+        var i = 65;
+        assertEquals(true, DataType.cast(i, Boolean.class));
+        assertEquals(65, i);
+        assertEquals(65., DataType.cast(i, Double.class), 0.);
+        assertEquals('A', DataType.cast(i, Character.class).charValue());
+        assertEquals("65", DataType.cast(i, String.class));
     }
 
     @Test
     public void testDecCasts() {
-        DataValue.init();
+        DataType.init();
 
-        var d = new DataValue<>(69.6);
-        assertEquals(true, d.cast(Boolean.class).value());
-        assertEquals(69, d.cast(Integer.class).value().intValue());
-        assertEquals(69.6, d.value().doubleValue(), 0.);
-        assertEquals('E', d.cast(Character.class).value().charValue());
-        assertEquals("69.6", d.cast(String.class).value());
+        var d = 69.6;
+        assertEquals(true, DataType.cast(d, Boolean.class));
+        assertEquals(69, DataType.cast(d, Integer.class).intValue());
+        assertEquals(69.6, d, 0.);
+        assertEquals('E', DataType.cast(d, Character.class).charValue());
+        assertEquals("69.6", DataType.cast(d, String.class));
     }
 
     @Test
     public void testCharCasts() {
-        DataValue.init();
+        DataType.init();
 
-        var c = new DataValue<>('v');
-        assertEquals(true, c.cast(Boolean.class).value());
-        assertEquals(118, c.cast(Integer.class).value().intValue());
-        assertEquals(118., c.cast(Double.class).value().doubleValue(), 0.);
-        assertEquals('v', c.value().charValue());
-        assertEquals("v", c.cast(String.class).value());
+        var c = 'v';
+        assertEquals(true, DataType.cast(c, Boolean.class));
+        assertEquals(118, DataType.cast(c, Integer.class).intValue());
+        assertEquals(118., DataType.cast(c, Double.class).doubleValue(), 0.0);
+        assertEquals('v', c);
+        assertEquals("v", DataType.cast(c, String.class));
     }
 
     @Test
     public void testStrCasts() {
-        DataValue.init();
+        DataType.init();
 
-        var s = new DataValue<>("Hello World");
-        assertEquals(true, s.cast(Boolean.class).value());
-        assertEquals(11, s.cast(Integer.class).value().intValue());
-        assertEquals(11., s.cast(Double.class).value().doubleValue(), 0.);
+        var s = "Hello World";
+        assertEquals(true, DataType.cast(s, Boolean.class));
+        assertEquals(11, DataType.cast(s, Integer.class).intValue());
+        assertEquals(11., DataType.cast(s, Double.class).doubleValue(), 0.0);
         //assertEquals('H', s.cast(Character.class).value().charValue());
-        assertEquals("Hello World", s.value());
+        assertEquals("Hello World", s);
     }
 
     @Test
     public void testNumMinusNum() {
-        DataValue.init();
-        var i = new DataValue<>(10);
-        var d = new DataValue<>(5.5);
-        assertEquals(4.5, i.apply(Token.Type.SUB, d).value());
-        assertEquals(-4.5, d.apply(Token.Type.SUB, i).value());
+        DataType.init();
+        assertEquals(4.5, DataType.apply2(Token.Type.SUB, 10, 5.5), 0.0);
+        assertEquals(-4.5, DataType.apply2(Token.Type.SUB, 5.5, 10), 0.0);
+    }
+
+    @Test
+    public void testStringMinusInt() {
+        DataType.init();
+        var s = "Hello World";
+        assertEquals("Hello World", DataType.apply2(Token.Type.SUB, s, 0));
+        assertEquals("Hello Worl", DataType.apply2(Token.Type.SUB, s, 1));
+        assertEquals("Hello Wor", DataType.apply2(Token.Type.SUB, s, 2));
+        assertEquals("Hello Wo", DataType.apply2(Token.Type.SUB, s, 3));
+        assertEquals("Hello W", DataType.apply2(Token.Type.SUB, s, 4));
+        assertEquals("", DataType.apply2(Token.Type.SUB, s, 11));
     }
 
     @Test
     public void testIntPlusInt() {
-        DataValue.init();
-        var a = new DataValue<>(12);
-        var b = new DataValue<>(35);
-        assertEquals(47, a.apply(Token.Type.ADD, b).value());
+        DataType.init();
+        assertEquals((Integer)47, DataType.apply2(Token.Type.ADD, 12, 35));
     }
 
     @Test
     public void testStringMinusString() {
-        DataValue.init();
-        var s1 = new DataValue<>("Hello World");
-        var s2 = new DataValue<>("Hell");
-        assertEquals("o World", s1.apply(Token.Type.SUB, s2).value());
+        DataType.init();
+        assertEquals("o World", DataType.apply2(Token.Type.SUB, "Hello World", "Hell"));
     }
 
     @Test
     public void testStringMinusChar() {
-        DataValue.init();
-        var s = new DataValue<>("Hello World");
-        var c = new DataValue<>('o');
-        assertEquals("Hell Wrld", s.apply(Token.Type.SUB, c).value());
+        DataType.init();
+        assertEquals("Hell Wrld", DataType.apply2(Token.Type.SUB, "Hello World", 'o'));
     }
 
     @Test
     public void testStringTimesInt() {
-        DataValue.init();
-        var s = new DataValue<>("Abc");
+        DataType.init();
+        var s = "Abc";
 
-        assertEquals("Abc", s.apply(Token.Type.MULT, new DataValue<>(1)).value());
-        assertEquals("", s.apply(Token.Type.MULT, new DataValue<>(0)).value());
-        assertEquals("cbA", s.apply(Token.Type.MULT, new DataValue<>(-1)).value());
-        assertEquals("AbcAbcAbc", s.apply(Token.Type.MULT, new DataValue<>(3)).value());
-        assertEquals("cbAcbAcbA", new DataValue<>(-3).apply(Token.Type.MULT, s).value());
+        assertEquals("Abc", DataType.apply2(Token.Type.MULT, s, 1));
+        assertEquals("", DataType.apply2(Token.Type.MULT, s, 0));
+        assertEquals("cbA", DataType.apply2(Token.Type.MULT, s, -1));
+        assertEquals("AbcAbcAbc", DataType.apply2(Token.Type.MULT, s, 3));
+        assertEquals("cbAcbAcbA", DataType.apply2(Token.Type.MULT, s, -3));
     }
 }

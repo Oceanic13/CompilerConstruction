@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import structs.DataValue;
 import tree.Statement;
+import utils.DataType;
 import utils.Pair;
 
 public class Context {
@@ -13,7 +13,7 @@ public class Context {
     private Context parent;
     private ArrayList<Context> children;
     private ArrayList<Statement> sequence;
-    private ArrayList<Pair<String, DataValue<?>>> variables;
+    private ArrayList<Pair<String, Object>> variables;
     private HashMap<String, Integer> variablesIndices;
 
     public Context() {
@@ -35,7 +35,7 @@ public class Context {
         return this;
     }
 
-    public void setVarData(int varIndex, DataValue<?> data) {
+    public void setVarData(int varIndex, Object data) {
         variables.get(varIndex).second = data;
     }
 
@@ -47,7 +47,7 @@ public class Context {
         return variables.get(i).first;
     }
 
-    public DataValue<?> varData(int i) {
+    public Object varData(int i) {
         return variables.get(i).second;
     }
 }

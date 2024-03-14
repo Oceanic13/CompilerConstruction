@@ -22,7 +22,7 @@ public class ScannerTests {
         assertEquals(Token.Type.VAR, tokens.get(0).TYPE);
         assertEquals(Token.Type.EOF, tokens.get(n-1).TYPE);
 
-        assertEquals(47, n);
+        assertEquals(52, n);
 
         System.out.println(tokens.toString());
     }

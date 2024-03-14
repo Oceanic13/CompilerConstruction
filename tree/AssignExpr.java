@@ -1,16 +1,16 @@
 package tree;
 
 import main.Context;
-import structs.DataValue;
+import scanner.Token;
 
 public class AssignExpr extends BinaryExpr {
 
     public AssignExpr(VarExpr left, Expr right) {
-        super((x,y)->y, left, right);
+        super(Token.Type.ASSIGN, left, right);
     }
 
     @Override
-    public DataValue<?> eval(Context context) {
+    public Object eval(Context context) {
         var r = super.eval(context);
         context.setVarData(((VarExpr)(left)).varIndex(), r);
         return r;
