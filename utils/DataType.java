@@ -57,35 +57,38 @@ public abstract class DataType {
         defOp(Token.Type.LESS, Integer.class, Integer.class, Boolean.class, (x,y) -> x<y);
 
         // Numeric, arithmetic operations
-        defSymmetricOp(Token.Type.ADD, Integer.class, Integer.class, Integer.class, (x,y) -> x+y);
-        defSymmetricOp(Token.Type.ADD, Double.class, Double.class, Double.class, (x,y) -> x+y);
-        defSymmetricOp(Token.Type.ADD, Integer.class, Double.class, Double.class, (x,y) -> x+y);
-        defOp(Token.Type.SUB, Integer.class, Integer.class, Integer.class, (x,y) -> x-y);
-        defOp(Token.Type.SUB, Integer.class, Double.class, Double.class, (x,y) -> x-y);
-        defOp(Token.Type.SUB, Double.class, Integer.class, Double.class, (x,y) -> x-y);
-        defOp(Token.Type.SUB, Double.class, Double.class, Double.class, (x,y) -> x-y);
-        defSymmetricOp(Token.Type.MULT, Integer.class, Integer.class, Integer.class, (x,y) -> x*y);
-        defSymmetricOp(Token.Type.MULT, Double.class, Double.class, Double.class, (x,y) -> x*y);
-        defSymmetricOp(Token.Type.MULT, Integer.class, Double.class, Double.class, (x,y) -> x*y);
+        defOp(Token.Type.MINUS, Integer.class, Integer.class, x -> -x);
+        defOp(Token.Type.MINUS, Double.class, Double.class, x -> -x);
+        defSymmetricOp(Token.Type.PLUS, Integer.class, Integer.class, Integer.class, (x,y) -> x+y);
+        defSymmetricOp(Token.Type.PLUS, Double.class, Double.class, Double.class, (x,y) -> x+y);
+        defSymmetricOp(Token.Type.PLUS, Integer.class, Double.class, Double.class, (x,y) -> x+y);
+        defOp(Token.Type.MINUS, Integer.class, Integer.class, Integer.class, (x,y) -> x-y);
+        defOp(Token.Type.MINUS, Integer.class, Double.class, Double.class, (x,y) -> x-y);
+        defOp(Token.Type.MINUS, Double.class, Integer.class, Double.class, (x,y) -> x-y);
+        defOp(Token.Type.MINUS, Double.class, Double.class, Double.class, (x,y) -> x-y);
+        defSymmetricOp(Token.Type.TIMES, Integer.class, Integer.class, Integer.class, (x,y) -> x*y);
+        defSymmetricOp(Token.Type.TIMES, Double.class, Double.class, Double.class, (x,y) -> x*y);
+        defSymmetricOp(Token.Type.TIMES, Integer.class, Double.class, Double.class, (x,y) -> x*y);
         defOp(Token.Type.DIV, Integer.class, Integer.class, Integer.class, (x,y) -> x/y);
         defOp(Token.Type.DIV, Integer.class, Double.class, Double.class, (x,y) -> x/y);
         defOp(Token.Type.DIV, Double.class, Integer.class, Double.class, (x,y) -> x/y);
         defOp(Token.Type.DIV, Double.class, Double.class, Double.class, (x,y) -> x/y);
 
         // String Number operations
-        defOp(Token.Type.SUB, String.class, Integer.class, String.class, (x,y) -> x.substring(0, x.length()-y));
-        defOp(Token.Type.ADD, Integer.class, String.class, String.class, (x,y) -> x+y);
-        defOp(Token.Type.ADD, String.class, Integer.class, String.class, (x,y) -> x+y);
-        defSymmetricOp(Token.Type.MULT, String.class, Integer.class, String.class, (x,y) -> y>=0? x.repeat(y) : new StringBuilder(x.repeat(-y)).reverse().toString());
+        defOp(Token.Type.MINUS, String.class, String.class, x -> new StringBuilder(x).reverse().toString());
+        defOp(Token.Type.MINUS, String.class, Integer.class, String.class, (x,y) -> x.substring(0, x.length()-y));
+        defOp(Token.Type.PLUS, Integer.class, String.class, String.class, (x,y) -> x+y);
+        defOp(Token.Type.PLUS, String.class, Integer.class, String.class, (x,y) -> x+y);
+        defSymmetricOp(Token.Type.TIMES, String.class, Integer.class, String.class, (x,y) -> y>=0? x.repeat(y) : new StringBuilder(x.repeat(-y)).reverse().toString());
 
         // String String/Char operations
-        defOp(Token.Type.ADD, Character.class, Character.class, String.class, (x,y) -> ""+x+y);
-        defOp(Token.Type.SUB, String.class, Character.class, String.class, (x,y) -> x.replaceAll(""+y, ""));
-        defOp(Token.Type.SUB, String.class, String.class, String.class, (x,y) -> x.replaceAll(y, ""));
+        defOp(Token.Type.PLUS, Character.class, Character.class, String.class, (x,y) -> ""+x+y);
+        defOp(Token.Type.MINUS, String.class, Character.class, String.class, (x,y) -> x.replaceAll(""+y, ""));
+        defOp(Token.Type.MINUS, String.class, String.class, String.class, (x,y) -> x.replaceAll(y, ""));
     
         // Apply operations to each element of array
-        defSymmetricOp(Token.Type.ADD, ARRAY_CLASS, Integer.class, ARRAY_CLASS, (x,y) -> Arrays.stream(x)
-        .map(i->DataType.apply2(Token.Type.ADD, i, y)).toArray());
+        defSymmetricOp(Token.Type.PLUS, ARRAY_CLASS, Integer.class, ARRAY_CLASS, (x,y) -> Arrays.stream(x)
+        .map(i->DataType.apply2(Token.Type.PLUS, i, y)).toArray());
     }
     
     public static <A,B> void defTypeCast(Class<A> T1, Class<B> T2, Function<A, B> cast) {

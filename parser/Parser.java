@@ -8,10 +8,14 @@ import scanner.NullToken;
 import scanner.Token;
 import scanner.Token.Type;
 import tree.AssignExpr;
+import tree.BinaryExpr;
+import tree.ConstExpr;
 import tree.Expr;
 import tree.ForStatement;
 import tree.Statement;
+import tree.UnaryExpr;
 import tree.IfStatement;
+import tree.MultiStatement;
 import tree.NullExpr;
 import tree.PrintStatement;
 import tree.VarExpr;
@@ -28,11 +32,19 @@ public class Parser {
     private Program context;
 
     public Parser() {
-        this(new ArrayList<>(Arrays. asList(new Token(Token.Type.EOF, "", null, 0))));
+        this(new ArrayList<>(Arrays.asList(new Token(Token.Type.EOF, "", null, 0))));
     }
 
     public Parser(ArrayList<Token> tokens) {
         reset(tokens);
+    }
+
+    public Parser(Token...tokens) {
+        reset(tokens);
+    }
+
+    public Parser reset(Token...tokens) {
+        return reset(new ArrayList<>(Arrays.asList(tokens)));
     }
 
     public Parser reset(ArrayList<Token> tokens) {
@@ -54,19 +66,17 @@ public class Parser {
     }
 
     public Program parseProgram() {
-        this.context = new Program();
-        var sequence = parseBlock();
-        for (var s : sequence) context.addStatement(s);
-        return new Program(parseBlock());
+        this.context = new Program(parseMultiStatement());
+        return context;
     }
 
     public Statement parseStatement() {
         switch (peek()) {
             case Token.Type.VAR: return parseVarDeclaration();
-            case Token.Type.IF: return parseIfStatement();
-            case Token.Type.WHILE: return parseWhileStatement();
-            case Token.Type.FOR: return parseForStatement();
-            case Token.Type.PRINT: return parsePrintStatement();
+            //case Token.Type.IF: return parseIfStatement();
+            //case Token.Type.WHILE: return parseWhileStatement();
+            //case Token.Type.FOR: return parseForStatement();
+            //case Token.Type.PRINT: return parsePrintStatement();
             default: return parseExpression();
         }
     }
@@ -81,62 +91,65 @@ public class Parser {
         }
         eat(Token.Type.SEMICOLON);
 
-        // TODO: GET CORREXT VARIABLE INDEX
-        return new AssignExpr(new VarExpr(0), right);
+        return new AssignExpr(new VarExpr((int)left.LITERAL), right);
     }
 
-    public IfStatement parseIfStatement() {
-        eat(Token.Type.IF);
-        eat(Token.Type.LPAREN);
-        var condition = parseExpression();
-        eat(Token.Type.RPAREN);
-        var s = new Statement[] {parseStatement()};
-
-        return new IfStatement(condition, s, null);
-    }
-
-    public WhileStatement parseWhileStatement() {
-        eat(Token.Type.WHILE);
-        eat(Token.Type.LPAREN);
-        var condition = parseExpression();
-        eat(Token.Type.RPAREN);
-        var s = new Statement[] {parseStatement()};
-
-        return new WhileStatement(condition, s);
-    }
-
-    public ForStatement parseForStatement() {
-        eat(Token.Type.FOR);
-        eat(Token.Type.LPAREN);
-        var initialization = parseStatement();
-        eat(Token.Type.SEMICOLON);
-        var termination = parseExpression();
-        eat(Token.Type.SEMICOLON);
-        var increment = parseStatement();
-        eat(Token.Type.RPAREN);
-        var sequence = new Statement[] {parseStatement()};
-
-        return new ForStatement(initialization, termination, increment, sequence);
-    }
-
-    public PrintStatement parsePrintStatement() {
-        eat(Token.Type.PRINT);
-        return new PrintStatement(parseExpression());
-    }
-
-    public Statement[] parseBlock() {
-        eat(Token.Type.LBRACE);
-        var sequence = new ArrayList<Statement>();
-        while (peek() != Token.Type.RBRACE) {
+    public MultiStatement parseMultiStatement() {
+        var sequence = new MultiStatement();
+        while (!isAtEnd() && peek() != Token.Type.RBRACE) {
             sequence.add(parseStatement());
+            eat(Token.Type.SEMICOLON);
         }
-        eat(Token.Type.RBRACE);
-        return sequence.toArray(new Statement[sequence.size()]);
+        return sequence;
     }
 
     public Expr parseExpression() {
         //TODO
         return null;
+    }
+
+    public Expr parseFactor() {
+        Expr factor = parseUnary();
+        while (peek() == Token.Type.TIMES || peek() == Token.Type.DIV) {
+            var token = advance();
+            var unary = parseUnary();
+            factor = new BinaryExpr(token.TYPE, factor, unary);
+        }
+        return factor;
+    }
+
+    public Expr parseUnary() {
+        Token token;
+        switch (peek()) {
+            case Token.Type.NOT:
+            case Token.Type.MINUS:
+                token = advance();
+                return new UnaryExpr(token.TYPE, parseUnary());
+            default:
+                return parsePrimary();
+        }
+    }
+
+    public Expr parsePrimary() {
+        var token = advance();
+        var type = token.TYPE;
+        switch (type) {
+            case Token.Type.TRUE: return new ConstExpr(true);
+            case Token.Type.FALSE: return new ConstExpr(false);
+            case Token.Type.INT:
+            case Token.Type.DEC:
+            case Token.Type.CHAR:
+            case Token.Type.STR: return new ConstExpr(token.LITERAL);
+            case Token.Type.ID: return new VarExpr((int)token.LITERAL);
+            case Token.Type.LPAREN:
+                var expr = parseExpression();
+                eat(Token.Type.RPAREN);
+                return expr;
+            default:
+                System.err.printf("Unexpected Token in Primary: %s\n", type);
+                System.exit(1);
+        }
+        return NullExpr.get();
     }
     
     private Token advance() {
@@ -171,10 +184,16 @@ public class Parser {
      * Otherwise, the token is not cosumed and false is returned.
      * @param expected expected token type
      **/
-    private boolean match(Token.Type expected) {
-        if (isAtEnd() || peek() != expected) return false;
-        advance();
-        return true;
+    private boolean match(Token.Type...expected) {
+        if (isAtEnd()) return false;
+        var peek = peek();
+        for (var exp : expected) {
+            if (peek == exp) {
+                advance();
+                return true;
+            }
+        }
+        return false;
     }
 
     private Token.Type peek() {
@@ -182,7 +201,7 @@ public class Parser {
         return tokens.get(index).TYPE;
     }
 
-    private boolean isAtEnd() {
-        return index >= tokens.size();
+    public boolean isAtEnd() {
+        return index >= tokens.size() || tokens.get(index).TYPE == Token.Type.EOF;
     }
 }

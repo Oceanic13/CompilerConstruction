@@ -35,11 +35,11 @@ public class Token {
         SEMICOLON,
         COMMA,
 
-        ADD,
-        SUB,
-        MULT,
+        PLUS,
+        MINUS,
+        TIMES,
         DIV,
-        POW,
+        //POW,
         LEQ,
         GEQ,
         LESS,
@@ -61,6 +61,7 @@ public class Token {
         FOR,
         FUNC,
 
+        //BOOL,
         INT,
         DEC,
         STR,

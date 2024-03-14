@@ -11,11 +11,11 @@ public class Program {
     private ArrayList<Object> variables;
 
     public Program() {
-        this(new Statement[0]);
+        this(new MultiStatement());
     }
 
-    public Program(Statement[] sequence) {
-        this.root = new MultiStatement(sequence);
+    public Program(MultiStatement sequence) {
+        this.root = sequence;
         this.variables = new ArrayList<>();
     }
 
@@ -36,5 +36,25 @@ public class Program {
 
     public void execute() {
         root.execute(this);
+    }
+
+    @Override
+    public String toString() {
+        var b = new StringBuilder();
+        b.append("===========================================\n");
+        b.append("PROGRAM\n");
+        b.append("-------------------------------------------\n");
+        for (int i = 0; i < variables.size(); ++i) {
+            var v = getVarValue(i);
+            if (v == null) {
+                b.append(String.format("VAR %d : <NULL, null>\n", i));
+            } else {
+                b.append(String.format("VAR %d : <%s, %s>\n", i, v.getClass().getSimpleName(), v.toString()));
+            }
+        }
+        b.append("-------------------------------------------\n");
+        b.append(root.toString()+'\n');
+        b.append("===========================================\n");
+        return b.toString();
     }
 }

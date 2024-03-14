@@ -19,14 +19,14 @@ public class TreeTests {
 
     @Test
     public void testTreeToString1() {
-        var root = new BinaryExpr(Token.Type.ADD, new ConstExpr(10), new BinaryExpr(Token.Type.MULT, new ConstExpr(2), new ConstExpr(5)));
+        var root = new BinaryExpr(Token.Type.PLUS, new ConstExpr(10), new BinaryExpr(Token.Type.TIMES, new ConstExpr(2), new ConstExpr(5)));
         System.out.println(root);
     }
 
     @Test
     public void testTreeToString2() {
         // a = a + 1
-        var incr = new AssignExpr(new VarExpr(0), new BinaryExpr(Token.Type.ADD, new VarExpr(0), new ConstExpr(1)));
+        var incr = new AssignExpr(new VarExpr(0), new BinaryExpr(Token.Type.PLUS, new VarExpr(0), new ConstExpr(1)));
 
         // a < 10
         var cond = new BinaryExpr.Less(new VarExpr(0), new ConstExpr(10));
@@ -40,7 +40,7 @@ public class TreeTests {
     @Test
     public void testSimpleExpressionTree() {
         DataType.init();
-        var root = new BinaryExpr(Token.Type.ADD, new ConstExpr(10), new BinaryExpr(Token.Type.MULT, new ConstExpr(2), new ConstExpr(5)));
+        var root = new BinaryExpr(Token.Type.PLUS, new ConstExpr(10), new BinaryExpr(Token.Type.TIMES, new ConstExpr(2), new ConstExpr(5)));
         assertEquals(20, root.eval(null));
     }
 
@@ -52,7 +52,7 @@ public class TreeTests {
         var init = new AssignExpr(new VarExpr(0), new ConstExpr(0));
 
         // a = a + 1
-        var incr = new AssignExpr(new VarExpr(0), new BinaryExpr(Token.Type.ADD, new VarExpr(0), new ConstExpr(1)));
+        var incr = new AssignExpr(new VarExpr(0), new BinaryExpr(Token.Type.PLUS, new VarExpr(0), new ConstExpr(1)));
 
         var context = new Program();
         context.addStatement(init);
@@ -70,7 +70,7 @@ public class TreeTests {
         var init = new AssignExpr(new VarExpr(0), new ConstExpr(0));
 
         // a = a + 1
-        var incr = new AssignExpr(new VarExpr(0), new BinaryExpr(Token.Type.ADD, new VarExpr(0), new ConstExpr(1)));
+        var incr = new AssignExpr(new VarExpr(0), new BinaryExpr(Token.Type.PLUS, new VarExpr(0), new ConstExpr(1)));
 
         // a < 10
         var cond = new BinaryExpr.Less(new VarExpr(0), new ConstExpr(10));
@@ -84,6 +84,8 @@ public class TreeTests {
         context.execute();
 
         assertEquals(10, context.getVarValue(0));
+
+        System.out.println(context);
     }
 
     @Test

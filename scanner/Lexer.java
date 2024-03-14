@@ -1,6 +1,7 @@
 package scanner;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import static java.util.Map.entry;  
@@ -29,10 +30,10 @@ public class Lexer {
         entry(')', Token.Type.RPAREN),
         entry('[', Token.Type.LBOXBRACKET),
         entry(']', Token.Type.RBOXBRACKET),
-        entry('+', Token.Type.ADD),
-        entry('-', Token.Type.SUB),
-        entry('*', Token.Type.MULT),
-        entry('^', Token.Type.POW),
+        entry('+', Token.Type.PLUS),
+        entry('-', Token.Type.MINUS),
+        entry('*', Token.Type.TIMES),
+        //entry('^', Token.Type.POW),
         entry(';', Token.Type.SEMICOLON),
         entry(',', Token.Type.COMMA)
     );
@@ -41,6 +42,7 @@ public class Lexer {
     private ArrayList<Token> tokens;
     private int line;
     private int index;
+    private HashMap<String, Integer> identifierIds;
 
     public Lexer() {
         this("");
@@ -55,6 +57,7 @@ public class Lexer {
         this.tokens = new ArrayList<>();
         this.line = 0;
         this.index = 0;
+        this.identifierIds = new HashMap<>();
         return this;
     }
     
@@ -136,7 +139,15 @@ public class Lexer {
         while (isAlpha(peek()) || isDigit(peek())) {advance();}
         String word = input.substring(start, index);
         Token.Type type = KEYWORDS.getOrDefault(word, Token.Type.ID);
-        addToken(type, word, null);
+
+        if (type != Token.Type.ID) {
+            // keyword
+            addToken(type, word, null);
+        } else {
+            // identifier
+            identifierIds.putIfAbsent(word, identifierIds.size());
+            addToken(type, word, identifierIds.get(word));
+        }
     }
 
     private void scanNumber(int start) {

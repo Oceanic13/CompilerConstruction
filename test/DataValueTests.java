@@ -80,38 +80,38 @@ public class DataValueTests {
     @Test
     public void testNumMinusNum() {
         DataType.init();
-        assertEquals(4.5, DataType.apply2(Token.Type.SUB, 10, 5.5), 0.0);
-        assertEquals(-4.5, DataType.apply2(Token.Type.SUB, 5.5, 10), 0.0);
+        assertEquals(4.5, DataType.apply2(Token.Type.MINUS, 10, 5.5), 0.0);
+        assertEquals(-4.5, DataType.apply2(Token.Type.MINUS, 5.5, 10), 0.0);
     }
 
     @Test
     public void testStringMinusInt() {
         DataType.init();
         var s = "Hello World";
-        assertEquals("Hello World", DataType.apply2(Token.Type.SUB, s, 0));
-        assertEquals("Hello Worl", DataType.apply2(Token.Type.SUB, s, 1));
-        assertEquals("Hello Wor", DataType.apply2(Token.Type.SUB, s, 2));
-        assertEquals("Hello Wo", DataType.apply2(Token.Type.SUB, s, 3));
-        assertEquals("Hello W", DataType.apply2(Token.Type.SUB, s, 4));
-        assertEquals("", DataType.apply2(Token.Type.SUB, s, 11));
+        assertEquals("Hello World", DataType.apply2(Token.Type.MINUS, s, 0));
+        assertEquals("Hello Worl", DataType.apply2(Token.Type.MINUS, s, 1));
+        assertEquals("Hello Wor", DataType.apply2(Token.Type.MINUS, s, 2));
+        assertEquals("Hello Wo", DataType.apply2(Token.Type.MINUS, s, 3));
+        assertEquals("Hello W", DataType.apply2(Token.Type.MINUS, s, 4));
+        assertEquals("", DataType.apply2(Token.Type.MINUS, s, 11));
     }
 
     @Test
     public void testIntPlusInt() {
         DataType.init();
-        assertEquals((Integer)47, DataType.apply2(Token.Type.ADD, 12, 35));
+        assertEquals((Integer)47, DataType.apply2(Token.Type.PLUS, 12, 35));
     }
 
     @Test
     public void testStringMinusString() {
         DataType.init();
-        assertEquals("o World", DataType.apply2(Token.Type.SUB, "Hello World", "Hell"));
+        assertEquals("o World", DataType.apply2(Token.Type.MINUS, "Hello World", "Hell"));
     }
 
     @Test
     public void testStringMinusChar() {
         DataType.init();
-        assertEquals("Hell Wrld", DataType.apply2(Token.Type.SUB, "Hello World", 'o'));
+        assertEquals("Hell Wrld", DataType.apply2(Token.Type.MINUS, "Hello World", 'o'));
     }
 
     @Test
@@ -119,11 +119,11 @@ public class DataValueTests {
         DataType.init();
         var s = "Abc";
 
-        assertEquals("Abc", DataType.apply2(Token.Type.MULT, s, 1));
-        assertEquals("", DataType.apply2(Token.Type.MULT, s, 0));
-        assertEquals("cbA", DataType.apply2(Token.Type.MULT, s, -1));
-        assertEquals("AbcAbcAbc", DataType.apply2(Token.Type.MULT, s, 3));
-        assertEquals("cbAcbAcbA", DataType.apply2(Token.Type.MULT, s, -3));
+        assertEquals("Abc", DataType.apply2(Token.Type.TIMES, s, 1));
+        assertEquals("", DataType.apply2(Token.Type.TIMES, s, 0));
+        assertEquals("cbA", DataType.apply2(Token.Type.TIMES, s, -1));
+        assertEquals("AbcAbcAbc", DataType.apply2(Token.Type.TIMES, s, 3));
+        assertEquals("cbAcbAcbA", DataType.apply2(Token.Type.TIMES, s, -3));
     }
 
     @Test
@@ -133,6 +133,6 @@ public class DataValueTests {
         var arr = new Object[] {10, 0.5, "Abc"};
         var exp = new Object[] {13, 3.5, "Abc3"};
 
-        assertArrayEquals(exp, DataType.apply2(Token.Type.ADD, arr, 3));
+        assertArrayEquals(exp, DataType.apply2(Token.Type.PLUS, arr, 3));
     }
 }
