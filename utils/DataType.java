@@ -50,11 +50,32 @@ public abstract class DataType {
         //defTypeCast(String.class, Character.class, x -> x.charAt(0));
         defTypeCast(String.class, String.class, x -> x);
 
+        // Array indexing
+        defOp(Token.Type.IDX, ARRAY_CLASS, Integer.class, Object.class, (x,y) -> x[y]);
+
         // Logical operations
         defOp(Token.Type.NOT, Boolean.class, Boolean.class, x->!x);
         defSymmetricOp(Token.Type.AND, Boolean.class, Boolean.class, Boolean.class, (x,y) -> x&&y);
         defSymmetricOp(Token.Type.OR, Boolean.class, Boolean.class, Boolean.class, (x,y) -> x||y);
         defOp(Token.Type.LESS, Integer.class, Integer.class, Boolean.class, (x,y) -> x<y);
+        defOp(Token.Type.LEQ, Integer.class, Integer.class, Boolean.class, (x,y) -> x<=y);
+        defOp(Token.Type.GREATER, Integer.class, Integer.class, Boolean.class, (x,y) -> x>y);
+        defOp(Token.Type.GEQ, Integer.class, Integer.class, Boolean.class, (x,y) -> x>=y);
+        defOp(Token.Type.LESS, Double.class, Double.class, Boolean.class, (x,y) -> x<y);
+        defOp(Token.Type.LEQ, Double.class, Double.class, Boolean.class, (x,y) -> x<=y);
+        defOp(Token.Type.GREATER, Double.class, Double.class, Boolean.class, (x,y) -> x>y);
+        defOp(Token.Type.GEQ, Double.class, Double.class, Boolean.class, (x,y) -> x>=y);
+        defOp(Token.Type.LESS, Integer.class, Double.class, Boolean.class, (x,y) -> x<y);
+        defOp(Token.Type.LEQ, Integer.class, Double.class, Boolean.class, (x,y) -> x<=y);
+        defOp(Token.Type.GREATER, Integer.class, Double.class, Boolean.class, (x,y) -> x>y);
+        defOp(Token.Type.GEQ, Integer.class, Double.class, Boolean.class, (x,y) -> x>=y);
+        defOp(Token.Type.LESS, Double.class, Integer.class, Boolean.class, (x,y) -> x<y);
+        defOp(Token.Type.LEQ, Double.class, Integer.class, Boolean.class, (x,y) -> x<=y);
+        defOp(Token.Type.GREATER, Double.class, Integer.class, Boolean.class, (x,y) -> x>y);
+        defOp(Token.Type.GEQ, Double.class, Integer.class, Boolean.class, (x,y) -> x>=y);
+        defSymmetricOp(Token.Type.EQ, Integer.class, Integer.class, Boolean.class, (x,y) -> x==y);
+        defSymmetricOp(Token.Type.EQ, Integer.class, Double.class, Boolean.class, (x,y) -> (double)x==y);
+        defSymmetricOp(Token.Type.EQ, Double.class, Double.class, Boolean.class, (x,y) -> x==y);
 
         // Numeric, arithmetic operations
         defOp(Token.Type.MINUS, Integer.class, Integer.class, x -> -x);

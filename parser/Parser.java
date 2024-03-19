@@ -185,7 +185,7 @@ public class Parser {
      */
     public MultiStatement parseMultiStatement() {
         var sequence = new MultiStatement();
-        while (!isAtEnd() && peek() != Token.Type.RBRACE) {
+        while (!isAtEnd() && peek() != Token.Type.RBRACE) { // return if reached LBRACE (end of code block)
             sequence.add(parseStatement());
         }
         return sequence;
@@ -306,7 +306,7 @@ public class Parser {
     }
 
     /**
-     * primary := := "true" | "false" | NUMBER | STRING | "(" expression ")" | IDENTIFIER
+     * primary := "true" | "false" | NUMBER | STRING | "(" expression ")" | IDENTIFIER | array
      **/
     public Expr parsePrimary() {
         var token = advance();
@@ -319,6 +319,7 @@ public class Parser {
             case Token.Type.CHAR:
             case Token.Type.STR: return new ConstExpr(token.LITERAL);
             case Token.Type.ID: return new VarExpr((int)token.LITERAL);
+            case Token.Type.LBOXBRACKET: return parseArray();
             case Token.Type.LPAREN:
                 var expr = parseExpression();
                 consume(Token.Type.RPAREN);
@@ -328,6 +329,24 @@ public class Parser {
                 System.exit(1);
         }
         return NullExpr.get();
+    }
+
+    /**
+     * array := "[" "]" | "[" expression ("," expression)*  "]"
+     **/
+    public ConstExpr parseArray() {
+        consume(Token.Type.LBOXBRACKET);
+        if (match(Token.Type.RBOXBRACKET)) {
+            return new ConstExpr(new Object[] {}); // empty array
+        }   
+
+        ArrayList<Expr> exprs = new ArrayList<>();
+        exprs.add(parseExpression());
+        while (match(Token.Type.COMMA)) {
+            exprs.add(parseExpression());
+        }
+
+        return null; // TODO
     }
     
     private Token advance() {

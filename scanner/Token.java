@@ -69,6 +69,8 @@ public class Token {
 
         ID,
 
+        IDX,
+
         NULL,
         EOF;
     }

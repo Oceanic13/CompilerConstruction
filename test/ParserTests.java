@@ -118,7 +118,7 @@ public class ParserTests {
         var parser = new Parser();
         ForStatement forS;
 
-        forS = parser.reset(new Lexer().reset("for (var i = 0; i < 10; i = i + 1) print i;").tokenize()).parseForStatement();
+        forS = parser.reset(new Lexer().reset("for (var i = 0; i < 10.0; i = i + 1) print i;").tokenize()).parseForStatement();
         assertTrue(parser.isAtEnd());
         new Program(forS).execute();
     }
