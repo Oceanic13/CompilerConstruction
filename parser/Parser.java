@@ -7,6 +7,7 @@ import main.Program;
 import scanner.NullToken;
 import scanner.Token;
 import scanner.Token.Type;
+import tree.ArrayExpr;
 import tree.AssignExpr;
 import tree.BinaryExpr;
 import tree.ConstExpr;
@@ -278,16 +279,29 @@ public class Parser {
     }
 
     /**
-    * factor := unary ( ( "/" | "*" ) unary )*
+    * factor := exponent ( ( "/" | "*" ) exponent )*
     **/
     public Expr parseFactor() {
-        Expr factor = parseUnary();
+        Expr factor = parseExponent();
         while (peek() == Token.Type.TIMES || peek() == Token.Type.DIV) {
             var token = advance();
-            var unary = parseUnary();
-            factor = new BinaryExpr(token.TYPE, factor, unary);
+            var exp = parseExponent();
+            factor = new BinaryExpr(token.TYPE, factor, exp);
         }
         return factor;
+    }
+
+    /**
+     * exponent := unary (^ unary )*
+     */
+    public Expr parseExponent() {
+        Expr exp = parseUnary();
+        while (peek() == Token.Type.POW) {
+            var token = advance();
+            var unary = parseUnary();
+            exp = new BinaryExpr(token.TYPE, unary, exp);
+        }
+        return exp;
     }
 
     /**
@@ -306,38 +320,45 @@ public class Parser {
     }
 
     /**
-     * primary := "true" | "false" | NUMBER | STRING | "(" expression ")" | IDENTIFIER | array
+     * primary := ("true" | "false" | NUMBER | STRING | "(" expression ")" | IDENTIFIER | array) ([expression])*
      **/
     public Expr parsePrimary() {
         var token = advance();
         var type = token.TYPE;
+        Expr primary = NullExpr.get();
         switch (type) {
-            case Token.Type.TRUE: return new ConstExpr(true);
-            case Token.Type.FALSE: return new ConstExpr(false);
+            case Token.Type.TRUE: primary = new ConstExpr(true); break;
+            case Token.Type.FALSE: primary = new ConstExpr(false); break;
             case Token.Type.INT:
             case Token.Type.DEC:
             case Token.Type.CHAR:
-            case Token.Type.STR: return new ConstExpr(token.LITERAL);
-            case Token.Type.ID: return new VarExpr((int)token.LITERAL);
-            case Token.Type.LBOXBRACKET: return parseArray();
+            case Token.Type.STR: primary = new ConstExpr(token.LITERAL); break;
+            case Token.Type.ID: primary = new VarExpr((int)token.LITERAL); break;
+            case Token.Type.LBOXBRACKET: index--; primary = parseArray(); break;
             case Token.Type.LPAREN:
-                var expr = parseExpression();
+                primary = parseExpression();
                 consume(Token.Type.RPAREN);
-                return expr;
+                break;
             default:
                 System.err.printf("Unexpected Token in Primary: %s\n", type);
                 System.exit(1);
         }
-        return NullExpr.get();
+
+        while (match(Token.Type.LBOXBRACKET)) {
+            primary = new BinaryExpr(Token.Type.IDX, primary, parseExpression());
+            consume(Token.Type.RBOXBRACKET);
+        }
+
+        return primary;
     }
 
     /**
      * array := "[" "]" | "[" expression ("," expression)*  "]"
      **/
-    public ConstExpr parseArray() {
+    public ArrayExpr parseArray() {
         consume(Token.Type.LBOXBRACKET);
         if (match(Token.Type.RBOXBRACKET)) {
-            return new ConstExpr(new Object[] {}); // empty array
+            return new ArrayExpr(new ArrayList<>()); // empty array
         }   
 
         ArrayList<Expr> exprs = new ArrayList<>();
@@ -345,8 +366,9 @@ public class Parser {
         while (match(Token.Type.COMMA)) {
             exprs.add(parseExpression());
         }
+        consume(Token.Type.RBOXBRACKET);
 
-        return null; // TODO
+        return new ArrayExpr(exprs);
     }
     
     private Token advance() {

@@ -52,6 +52,7 @@ public abstract class DataType {
 
         // Array indexing
         defOp(Token.Type.IDX, ARRAY_CLASS, Integer.class, Object.class, (x,y) -> x[y]);
+        defOp(Token.Type.IDX, String.class, Integer.class, Object.class, (x,y) -> x.charAt(y));
 
         // Logical operations
         defOp(Token.Type.NOT, Boolean.class, Boolean.class, x->!x);
@@ -94,6 +95,10 @@ public abstract class DataType {
         defOp(Token.Type.DIV, Integer.class, Double.class, Double.class, (x,y) -> x/y);
         defOp(Token.Type.DIV, Double.class, Integer.class, Double.class, (x,y) -> x/y);
         defOp(Token.Type.DIV, Double.class, Double.class, Double.class, (x,y) -> x/y);
+        defOp(Token.Type.POW, Integer.class, Integer.class, Double.class, (x,y) -> Math.pow(x,y));
+        defOp(Token.Type.POW, Double.class, Double.class, Double.class, (x,y) -> Math.pow(x,y));
+        defOp(Token.Type.POW, Double.class, Integer.class, Double.class, (x,y) -> Math.pow(x,y));
+        defOp(Token.Type.POW, Integer.class, Double.class, Double.class, (x,y) -> Math.pow(x,y));
 
         // String Number operations
         defOp(Token.Type.MINUS, String.class, String.class, x -> new StringBuilder(x).reverse().toString());

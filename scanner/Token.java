@@ -39,7 +39,7 @@ public class Token {
         MINUS,
         TIMES,
         DIV,
-        //POW,
+        POW,
         LEQ,
         GEQ,
         LESS,

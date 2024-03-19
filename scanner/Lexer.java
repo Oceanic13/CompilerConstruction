@@ -35,7 +35,7 @@ public class Lexer {
         entry('+', Token.Type.PLUS),
         entry('-', Token.Type.MINUS),
         entry('*', Token.Type.TIMES),
-        //entry('^', Token.Type.POW),
+        entry('^', Token.Type.POW),
         entry(';', Token.Type.SEMICOLON),
         entry(',', Token.Type.COMMA)
     );

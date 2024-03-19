@@ -3,6 +3,8 @@ package test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
+
 import org.junit.Test;
 
 import main.Program;
@@ -121,5 +123,55 @@ public class ParserTests {
         forS = parser.reset(new Lexer().reset("for (var i = 0; i < 10.0; i = i + 1) print i;").tokenize()).parseForStatement();
         assertTrue(parser.isAtEnd());
         new Program(forS).execute();
+    }
+
+    @Test
+    public void testStringIndex() {
+        DataType.init();
+
+        var parser = new Parser();
+        Expr e;
+
+        e = parser.reset(new Lexer().reset("var x = \"Hello World\"[6]").tokenize()).parseVarDeclaration();
+        assertTrue(parser.isAtEnd());
+
+        var p = new Program(e);
+        p.execute();
+        assertEquals('W', p.getVarValue(0));
+    }
+
+    @Test
+    public void testArray() {
+        DataType.init();
+
+        var parser = new Parser();
+        Expr e;
+
+        e = parser.reset(new Lexer().reset("var a = [1, 10.5, \"Boo\", \'G\', true]").tokenize()).parseVarDeclaration();
+        assertTrue(parser.isAtEnd());
+
+        var p = new Program(e);
+        p.execute();
+        var v = (Object[]) p.getVarValue(0);
+    
+        assertEquals(1, v[0]);
+        assertEquals(10.5, v[1]);
+        assertEquals("Boo", v[2]);
+        assertEquals('G', v[3]);
+        assertEquals(true, v[4]);
+    }
+
+    @Test
+    public void testPow() {
+        DataType.init();
+
+        var parser = new Parser(new Lexer().reset("var a = 2^3^2").tokenize());
+
+        var p = parser.parse();
+        assertTrue(parser.isAtEnd());
+
+        p.execute();
+
+        assertEquals(512.0, p.getVarValue(0));
     }
 }
