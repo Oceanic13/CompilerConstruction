@@ -340,13 +340,16 @@ public class Parser {
                 consume(Token.Type.RPAREN);
                 break;
             default:
-                System.err.printf("Unexpected Token in Primary: %s\n", type);
+                System.err.printf("Unexpected Token in Primary Expression: %s\n", type);
                 System.exit(1);
         }
 
-        while (match(Token.Type.LBOXBRACKET)) {
-            primary = new BinaryExpr(Token.Type.IDX, primary, parseExpression());
-            consume(Token.Type.RBOXBRACKET);
+        // parse index operation on string, array or expression
+        if (type == Token.Type.STR || type == Token.Type.LBOXBRACKET || type == Token.Type.LPAREN) {
+            while (match(Token.Type.LBOXBRACKET)) {
+                primary = new BinaryExpr(Token.Type.IDX, primary, parseExpression());
+                consume(Token.Type.RBOXBRACKET);
+            }
         }
 
         return primary;
