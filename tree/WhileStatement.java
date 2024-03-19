@@ -6,12 +6,12 @@ import utils.DataType;
 public class WhileStatement extends Statement {
 
     private Expr condition;
-    private MultiStatement sequence;
+    private Statement sequence;
 
-    public WhileStatement(Expr condition, Statement... sequence) {
+    public WhileStatement(Expr condition, Statement sequence) {
         super();
         this.condition = condition;
-        this.sequence = new MultiStatement(sequence);
+        this.sequence = sequence;
     }
 
     @Override

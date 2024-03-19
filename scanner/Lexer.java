@@ -20,7 +20,9 @@ public class Lexer {
         entry("else", Token.Type.ELSE),
         entry("while", Token.Type.WHILE),
         entry("for", Token.Type.FOR),
-        entry("func", Token.Type.FUNC)
+        entry("func", Token.Type.FUNC),
+        entry("or", Token.Type.OR),
+        entry("and", Token.Type.AND)
     );
 
     private static final Map<Character, Token.Type> CHARS = Map.ofEntries(

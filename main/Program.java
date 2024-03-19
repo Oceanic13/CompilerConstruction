@@ -14,8 +14,8 @@ public class Program {
         this(new MultiStatement());
     }
 
-    public Program(MultiStatement sequence) {
-        this.root = sequence;
+    public Program(Statement sequence) {
+        this.root = new MultiStatement(sequence);
         this.variables = new ArrayList<>();
     }
 

@@ -17,6 +17,7 @@ import tree.UnaryExpr;
 import tree.IfStatement;
 import tree.MultiStatement;
 import tree.NullExpr;
+import tree.NullStatement;
 import tree.PrintStatement;
 import tree.VarExpr;
 import tree.WhileStatement;
@@ -70,44 +71,215 @@ public class Parser {
         return context;
     }
 
-    public Statement parseStatement() {
+    /**
+     * statement := var_declaration | if_statement | while_statement | for_statement | print_statement | expression
+     */
+    public Statement parseStatement(boolean expectSemicolonAtEnd) {
+        Statement s = NullStatement.get();
+
         switch (peek()) {
-            case Token.Type.VAR: return parseVarDeclaration();
-            //case Token.Type.IF: return parseIfStatement();
-            //case Token.Type.WHILE: return parseWhileStatement();
-            //case Token.Type.FOR: return parseForStatement();
-            //case Token.Type.PRINT: return parsePrintStatement();
-            default: return parseExpression();
+            case Token.Type.VAR: s = parseVarDeclaration(); break;
+            case Token.Type.IF: s = parseIfStatement(); break;
+            case Token.Type.WHILE: s = parseWhileStatement(); break;
+            case Token.Type.FOR: s = parseForStatement(); break;
+            case Token.Type.PRINT: s = parsePrintStatement(); break;
+            default: s = parseExpression(); break;
         }
+        if (expectSemicolonAtEnd) consume(Token.Type.SEMICOLON);
+        return s;
+    }
+    public Statement parseStatement() {return parseStatement(true);}
+
+    public PrintStatement parsePrintStatement() {
+        consume(Token.Type.PRINT);
+        return new PrintStatement(parseExpression());
     }
 
+    /**
+     * if_statement := if "("expression")"" (statement | "{"multi_statement"}") (else statement)?
+     */
+    public IfStatement parseIfStatement() {
+        consume(Token.Type.IF);
+        consume(Token.Type.LPAREN);
+        var cond = parseExpression();
+        consume(Token.Type.RPAREN);
+
+        Statement ifSeq = NullStatement.get();
+        if (match(Token.Type.LBRACE)) {
+            ifSeq = parseMultiStatement();
+            consume(Token.Type.RBRACE);
+        } else {
+            ifSeq = parseStatement();
+        }
+        
+        Statement elseSeq = NullStatement.get();
+        if (match(Token.Type.ELSE)) {
+            if (match(Token.Type.LBRACE)) {
+                elseSeq = parseMultiStatement();
+                consume(Token.Type.RBRACE);
+            } else {
+                elseSeq = parseStatement();
+            }
+        }
+
+        return new IfStatement(cond, ifSeq, elseSeq);
+    }
+
+    /**
+     * while_statement := while "("expression")"" (statement | "{"multi_statement"}")
+     */
+    public WhileStatement parseWhileStatement() {
+        consume(Token.Type.WHILE);
+        consume(Token.Type.LPAREN);
+        var cond = parseExpression();
+        consume(Token.Type.RPAREN);
+
+        Statement seq = NullStatement.get();
+        if (match(Token.Type.LBRACE)) {
+            seq = parseMultiStatement();
+            consume(Token.Type.RBRACE);
+        } else {
+            seq = parseStatement();
+        }
+
+        return new WhileStatement(cond, seq);
+    }
+
+    public ForStatement parseForStatement() {
+        consume(Token.Type.FOR);
+        consume(Token.Type.LPAREN);
+        var init = parseStatement();
+        var cond = parseExpression();
+        consume(Token.Type.SEMICOLON);
+        var incr = parseStatement(false);
+        consume(Token.Type.RPAREN);
+
+        Statement seq = NullStatement.get();
+        if (match(Token.Type.LBRACE)) {
+            seq = parseMultiStatement();
+            consume(Token.Type.RBRACE);
+        } else {
+            seq = parseStatement();
+        }
+
+        return new ForStatement(init, cond, incr, seq);
+    }
+
+    /**
+     * var_declaration := var IDENTIFIER "=" expression 
+     */
     public AssignExpr parseVarDeclaration() {
-        eat(Token.Type.VAR);
-        Token left = eat(Token.Type.ID);
+        consume(Token.Type.VAR);
+        Token left = consume(Token.Type.ID);
 
         Expr right = NullExpr.get();
         if (match(Token.Type.ASSIGN)) {
             right = parseExpression();
         }
-        eat(Token.Type.SEMICOLON);
 
         return new AssignExpr(new VarExpr((int)left.LITERAL), right);
     }
 
+    /**
+     * multistatement := (statement)*
+     */
     public MultiStatement parseMultiStatement() {
         var sequence = new MultiStatement();
         while (!isAtEnd() && peek() != Token.Type.RBRACE) {
             sequence.add(parseStatement());
-            eat(Token.Type.SEMICOLON);
         }
         return sequence;
     }
 
+    /**
+     * expression := assignment
+     */
     public Expr parseExpression() {
-        //TODO
-        return null;
+        return parseAssignment();
     }
 
+    /**
+     * assignment := IDENTIFIER "=" assignment | logic_or
+     */
+    public Expr parseAssignment() {
+        if (peek(0) == Token.Type.ID && peek(1) == Token.Type.ASSIGN) {
+            var left = consume(Token.Type.ID);
+            consume(Token.Type.ASSIGN);
+            var right = parseAssignment();
+            return new AssignExpr(new VarExpr((int)left.LITERAL), right);
+        } else {
+            return parseLogicOr();
+        }
+    }
+
+    /**
+     * logic_or := logic_and ( "or" logic_and )*
+     */
+    public Expr parseLogicOr() {
+        Expr lor = parseLogicAnd();
+        while (peek() == Token.Type.OR) {
+            var token = advance();
+            var land = parseLogicAnd();
+            lor = new BinaryExpr(token.TYPE, lor, land);
+        }
+        return lor;
+    }
+
+    /**
+     * logic_and := equality ( "and" equality )*
+     */
+    public Expr parseLogicAnd() {
+        Expr land = parseEquality();
+        while (peek() == Token.Type.AND) {
+            var token = advance();
+            var eq = parseEquality();
+            land = new BinaryExpr(token.TYPE, land, eq);
+        }
+        return land;
+    }
+
+    /**
+    * equality := comparison ( ( "!=" | "==" ) comparison )*
+    **/
+    public Expr parseEquality() {
+        Expr eq = parseComparison();
+        while (peek() == Token.Type.NEQ || peek() == Token.Type.EQ) {
+            var token = advance();
+            var comp = parseComparison();
+            eq = new BinaryExpr(token.TYPE, eq, comp);
+        }
+        return eq;
+    }
+
+    /**
+    * comparison := term ( ( ">" | ">=" | "<" | "<=" ) term )*
+    **/
+    public Expr parseComparison() {
+        Expr comp = parseTerm();
+        while (peek() == Token.Type.GREATER || peek() == Token.Type.GEQ || peek() == Token.Type.LESS || peek() == Token.Type.LEQ) {
+            var token = advance();
+            var term = parseTerm();
+            comp = new BinaryExpr(token.TYPE, comp, term);
+        }
+        return comp;
+    }
+
+    /**
+    * term := factor ( ( "-" | "+" ) factor )*
+    **/
+    public Expr parseTerm() {
+        Expr term = parseFactor();
+        while (peek() == Token.Type.MINUS || peek() == Token.Type.PLUS) {
+            var token = advance();
+            var factor = parseFactor();
+            term = new BinaryExpr(token.TYPE, term, factor);
+        }
+        return term;
+    }
+
+    /**
+    * factor := unary ( ( "/" | "*" ) unary )*
+    **/
     public Expr parseFactor() {
         Expr factor = parseUnary();
         while (peek() == Token.Type.TIMES || peek() == Token.Type.DIV) {
@@ -118,6 +290,9 @@ public class Parser {
         return factor;
     }
 
+    /**
+     * unary := := ( "!" | "-" ) unary | primary
+     **/
     public Expr parseUnary() {
         Token token;
         switch (peek()) {
@@ -130,6 +305,9 @@ public class Parser {
         }
     }
 
+    /**
+     * primary := := "true" | "false" | NUMBER | STRING | "(" expression ")" | IDENTIFIER
+     **/
     public Expr parsePrimary() {
         var token = advance();
         var type = token.TYPE;
@@ -143,7 +321,7 @@ public class Parser {
             case Token.Type.ID: return new VarExpr((int)token.LITERAL);
             case Token.Type.LPAREN:
                 var expr = parseExpression();
-                eat(Token.Type.RPAREN);
+                consume(Token.Type.RPAREN);
                 return expr;
             default:
                 System.err.printf("Unexpected Token in Primary: %s\n", type);
@@ -170,7 +348,7 @@ public class Parser {
         return t;
     }
 
-    private Token eat(Token.Type expected) {
+    private Token consume(Token.Type expected) {
         if (peek() != expected) {
             System.err.printf("Unexpected Token. Expected %s but got %s\n", expected, peek());
             return NullToken.get();
@@ -197,8 +375,12 @@ public class Parser {
     }
 
     private Token.Type peek() {
-        if (isAtEnd()) return Token.Type.NULL;
-        return tokens.get(index).TYPE;
+        return peek(0);
+    }
+
+    private Token.Type peek(int o) {
+        if (index+o >= tokens.size()) return Token.Type.NULL;
+        return tokens.get(index+o).TYPE;
     }
 
     public boolean isAtEnd() {

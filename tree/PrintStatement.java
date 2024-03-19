@@ -16,4 +16,11 @@ public class PrintStatement extends Statement {
     public void execute(Program context) {
         System.out.println(DataType.cast(expr.eval(context), String.class));
     }
+
+    @Override
+    public String toString() {
+        var b = new StringBuilder();
+        b.append(String.format("PRINT %s", expr.toString()));
+        return b.toString();
+    }
 }

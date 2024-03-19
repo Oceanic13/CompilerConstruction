@@ -5,14 +5,14 @@ import utils.DataType;
 
 public class IfStatement extends Statement {
 
-    private MultiStatement ifSequence;
+    private Statement ifSequence;
     private Expr ifCondition;
-    private IfStatement elseIf;
+    private Statement elseSequence;
 
-    public IfStatement(Expr ifCondition, Statement[] ifSequence, IfStatement elseIf) {
+    public IfStatement(Expr ifCondition, Statement ifSequence, Statement elseSequence) {
         super();
-        this.ifSequence = new MultiStatement(ifSequence);
-        this.elseIf = elseIf;
+        this.ifSequence = ifSequence;
+        this.elseSequence = elseSequence;
         this.ifCondition = ifCondition; 
     }
 
@@ -20,8 +20,15 @@ public class IfStatement extends Statement {
     public void execute(Program context) {
         if (DataType.cast(ifCondition.eval(context), Boolean.class)) {
             ifSequence.execute(context);
-        } else if (elseIf != null && DataType.cast(elseIf.ifCondition.eval(context), Boolean.class)) {
-            elseIf.ifSequence.execute(context);
+        } else {
+            elseSequence.execute(context);
         }
+    }
+
+    @Override
+    public String toString() {
+        var b = new StringBuilder();
+        b.append(String.format("IF <%s> {\n%s\n} ELSE {\n<%s>\n}", ifCondition.toString(), ifSequence.toString(), elseSequence.toString()));
+        return b.toString();
     }
 }
