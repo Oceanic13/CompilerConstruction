@@ -323,19 +323,21 @@ public class Parser {
      * primary := ("true" | "false" | NUMBER | STRING | "(" expression ")" | IDENTIFIER | array) ([expression])*
      **/
     public Expr parsePrimary() {
-        var token = advance();
-        var type = token.TYPE;
+        //var token = advance();
+        //var type = token.TYPE;
         Expr primary = NullExpr.get();
+        var type = peek();
         switch (type) {
-            case Token.Type.TRUE: primary = new ConstExpr(true); break;
-            case Token.Type.FALSE: primary = new ConstExpr(false); break;
+            case Token.Type.TRUE: consume(Token.Type.TRUE); primary = new ConstExpr(true); break;
+            case Token.Type.FALSE: consume(Token.Type.FALSE); primary = new ConstExpr(false); break;
             case Token.Type.INT:
             case Token.Type.DEC:
             case Token.Type.CHAR:
-            case Token.Type.STR: primary = new ConstExpr(token.LITERAL); break;
-            case Token.Type.ID: primary = new VarExpr((int)token.LITERAL); break;
-            case Token.Type.LBOXBRACKET: index--; primary = parseArray(); break;
+            case Token.Type.STR: primary = new ConstExpr(advance().LITERAL); break;
+            case Token.Type.ID: primary = new VarExpr((int)advance().LITERAL); break;
+            case Token.Type.LBOXBRACKET: primary = parseArray(); break;
             case Token.Type.LPAREN:
+                consume(Token.Type.LPAREN);
                 primary = parseExpression();
                 consume(Token.Type.RPAREN);
                 break;
@@ -344,8 +346,8 @@ public class Parser {
                 System.exit(1);
         }
 
-        // parse index operation on string, array or expression
-        if (type == Token.Type.STR || type == Token.Type.LBOXBRACKET || type == Token.Type.LPAREN) {
+        // parse index operation on string, array, identifier or expression
+        if (type == Token.Type.ID || type == Token.Type.STR || type == Token.Type.LBOXBRACKET || type == Token.Type.LPAREN) {
             while (match(Token.Type.LBOXBRACKET)) {
                 primary = new BinaryExpr(Token.Type.IDX, primary, parseExpression());
                 consume(Token.Type.RBOXBRACKET);

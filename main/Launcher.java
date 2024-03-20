@@ -2,6 +2,7 @@ package main;
 
 import java.util.ArrayList;
 
+import gui.Window;
 import parser.Parser;
 import scanner.Lexer;
 import scanner.Token;
@@ -21,5 +22,7 @@ public class Launcher {
         System.out.println(p);
 
         p.execute();
+
+        new Window();
     }
 }

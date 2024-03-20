@@ -71,6 +71,12 @@ public class Token {
 
         IDX,
 
+        CASTBOOl,
+        CASTINT,
+        CASTDEC,
+        CASTCHAR,
+        CASTSTR,
+
         NULL,
         EOF;
     }

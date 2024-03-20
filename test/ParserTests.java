@@ -152,7 +152,7 @@ public class ParserTests {
 
         var p = new Program(e);
         p.execute();
-        var v = (Object[]) p.getVarValue(0);
+        Object[] v = (Object[]) p.getVarValue(0);
     
         assertEquals(1, v[0]);
         assertEquals(10.5, v[1]);

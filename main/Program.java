@@ -6,6 +6,8 @@ import tree.MultiStatement;
 import tree.Statement;
 
 public class Program {
+
+    // TODO: functions, objects
     
     private MultiStatement root;
     private ArrayList<Object> variables;

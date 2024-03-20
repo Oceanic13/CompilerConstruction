@@ -18,6 +18,11 @@ public abstract class DataType {
     private static HashMap<Token.Type, HashMap<Class<?>, HashMap<Class<?>, Binary<?,?,?>>>> BINARY_OPS = new HashMap<>();
     private static HashMap<Token.Type, HashMap<Class<?>, Unary<?,?>>> UNARY_OPS = new HashMap<>();
 
+    //TODO: For simplicity: Get rid of Character (only String) and Integer (only Double or some new Number Object)
+    // Data Types: Boolean, Number, String, Array (of type Object)
+
+    // OR: TODO: Not HashMaps but Sets, be able to define operation on superclass (e.g. Number or Object)
+
     public static void init() {
 
         defTypeCast(Boolean.class, Boolean.class, x -> x);
@@ -50,9 +55,11 @@ public abstract class DataType {
         //defTypeCast(String.class, Character.class, x -> x.charAt(0));
         defTypeCast(String.class, String.class, x -> x);
 
+        defTypeCast(ARRAY_CLASS, String.class, x -> Arrays.toString(x));
+
         // Array indexing
-        defOp(Token.Type.IDX, ARRAY_CLASS, Integer.class, Object.class, (x,y) -> x[y]);
-        defOp(Token.Type.IDX, String.class, Integer.class, Object.class, (x,y) -> x.charAt(y));
+        defOp(Token.Type.IDX, ARRAY_CLASS, Integer.class, Object.class, (x,y) -> x[(y>=0)? y : x.length-y]);
+        defOp(Token.Type.IDX, String.class, Integer.class, Character.class, (x,y) -> x.charAt((y>=0)? y : x.length()-y));
 
         // Logical operations
         defOp(Token.Type.NOT, Boolean.class, Boolean.class, x->!x);
