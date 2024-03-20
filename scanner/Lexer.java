@@ -16,6 +16,7 @@ public class Lexer {
         entry("false", Token.Type.FALSE),
         entry("var", Token.Type.VAR),
         entry("print", Token.Type.PRINT),
+        entry("return", Token.Type.RETURN),
         entry("if", Token.Type.IF),
         entry("else", Token.Type.ELSE),
         entry("while", Token.Type.WHILE),
@@ -64,8 +65,6 @@ public class Lexer {
     }
     
     public ArrayList<Token> tokenize() {
-
-        System.out.println(input);
 
         // get all tokens
         while (!isAtEnd()) {

@@ -20,6 +20,7 @@ import tree.MultiStatement;
 import tree.NullExpr;
 import tree.NullStatement;
 import tree.PrintStatement;
+import tree.ReturnStatement;
 import tree.VarExpr;
 import tree.WhileStatement;
 import utils.Stack;
@@ -79,14 +80,15 @@ public class Parser {
         Statement s = NullStatement.get();
 
         switch (peek()) {
-            case Token.Type.VAR: s = parseVarDeclaration(); break;
+            case Token.Type.VAR: s = parseVarDeclaration(); consume(Token.Type.SEMICOLON); break;
+            case Token.Type.FUNC: s = parseFuncDeclaration(); break;
             case Token.Type.IF: s = parseIfStatement(); break;
             case Token.Type.WHILE: s = parseWhileStatement(); break;
             case Token.Type.FOR: s = parseForStatement(); break;
-            case Token.Type.PRINT: s = parsePrintStatement(); break;
-            default: s = parseExpression(); break;
+            case Token.Type.PRINT: s = parsePrintStatement(); consume(Token.Type.SEMICOLON); break;
+            case Token.Type.RETURN: s = parseReturnStatement(); consume(Token.Type.SEMICOLON); break;
+            default: s = parseExpression(); if (expectSemicolonAtEnd) consume(Token.Type.SEMICOLON); break;
         }
-        if (expectSemicolonAtEnd) consume(Token.Type.SEMICOLON);
         return s;
     }
     public Statement parseStatement() {return parseStatement(true);}
@@ -95,6 +97,11 @@ public class Parser {
         consume(Token.Type.PRINT);
         return new PrintStatement(parseExpression());
     }
+
+    public ReturnStatement parseReturnStatement() {
+        consume(Token.Type.RETURN);
+        return new ReturnStatement(parseExpression());
+    } 
 
     /**
      * if_statement := if "("expression")"" (statement | "{"multi_statement"}") (else statement)?
@@ -179,6 +186,18 @@ public class Parser {
         }
 
         return new AssignExpr(new VarExpr((int)left.LITERAL), right);
+    }
+
+    public Expr parseFuncDeclaration() {
+        consume(Token.Type.FUNC);
+        var idToken = consume(Token.Type.ID);
+        consume(Token.Type.LPAREN);
+        var args = parseIdList();
+        consume(Token.Type.RPAREN);
+        consume(Token.Type.LBRACE);
+        var seq = parseMultiStatement();
+        consume(Token.Type.RBRACE);
+        return NullExpr.get();
     }
 
     /**
@@ -320,7 +339,7 @@ public class Parser {
     }
 
     /**
-     * primary := ("true" | "false" | NUMBER | STRING | "(" expression ")" | IDENTIFIER | array) ([expression])*
+     * primary := ("true" | "false" | NUMBER | STRING | "(" expression ")" | IDENTIFIER | function_call | array) ([expression])*
      **/
     public Expr parsePrimary() {
         //var token = advance();
@@ -334,7 +353,13 @@ public class Parser {
             case Token.Type.DEC:
             case Token.Type.CHAR:
             case Token.Type.STR: primary = new ConstExpr(advance().LITERAL); break;
-            case Token.Type.ID: primary = new VarExpr((int)advance().LITERAL); break;
+            case Token.Type.ID:
+                if (peek(1) == Token.Type.LPAREN) {
+                    primary = parseFunctionCall();
+                } else {
+                    primary = new VarExpr((int)advance().LITERAL);
+                }
+                break;
             case Token.Type.LBOXBRACKET: primary = parseArray(); break;
             case Token.Type.LPAREN:
                 consume(Token.Type.LPAREN);
@@ -357,23 +382,50 @@ public class Parser {
         return primary;
     }
 
+    public Expr parseFunctionCall() {
+        var idToken = consume(Token.Type.ID);
+        consume(Token.Type.LPAREN);
+        var args = parseExprList();
+        consume(Token.Type.RPAREN);
+        return NullExpr.get(); //TODO
+    }
+
     /**
-     * array := "[" "]" | "[" expression ("," expression)*  "]"
+     * array := "[" "]" | "[" expr_list "]"
      **/
     public ArrayExpr parseArray() {
         consume(Token.Type.LBOXBRACKET);
         if (match(Token.Type.RBOXBRACKET)) {
             return new ArrayExpr(new ArrayList<>()); // empty array
         }   
+        var exprs = parseExprList();
+        consume(Token.Type.RBOXBRACKET);
 
+        return new ArrayExpr(exprs);
+    }
+
+    /**
+     * expr_list := expression ("," expression)*
+     */
+    private ArrayList<Expr> parseExprList() {
         ArrayList<Expr> exprs = new ArrayList<>();
         exprs.add(parseExpression());
         while (match(Token.Type.COMMA)) {
             exprs.add(parseExpression());
         }
-        consume(Token.Type.RBOXBRACKET);
+        return exprs;
+    }
 
-        return new ArrayExpr(exprs);
+    /**
+     * id_list := IDENTIFIER ("," IDENTIFIER)*
+     */
+    private ArrayList<VarExpr> parseIdList() {
+        ArrayList<VarExpr> exprs = new ArrayList<>();
+        exprs.add(new VarExpr((int)consume(Token.Type.ID).LITERAL));
+        while (match(Token.Type.COMMA)) {
+            exprs.add(new VarExpr((int)consume(Token.Type.ID).LITERAL));
+        }
+        return exprs;
     }
     
     private Token advance() {

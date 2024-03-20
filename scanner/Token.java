@@ -60,6 +60,7 @@ public class Token {
         WHILE,
         FOR,
         FUNC,
+        RETURN,
 
         //BOOL,
         INT,
