@@ -12,7 +12,7 @@ public class ConstExpr extends Expr {
     }
 
     @Override
-    public Object eval(Program context) {
+    public Object eval() {
         return value;
     }
     

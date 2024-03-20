@@ -11,7 +11,7 @@ public class NullExpr extends Expr {
     }
 
     @Override
-    public Object eval(Program context) {
+    public Object eval() {
         return null;
     }
     

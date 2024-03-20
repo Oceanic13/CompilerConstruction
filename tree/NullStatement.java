@@ -11,7 +11,7 @@ public class NullStatement extends Statement {
     }
 
     @Override
-    public void execute(Program context) {
+    public void execute() {
         // Do nothing
     }
 

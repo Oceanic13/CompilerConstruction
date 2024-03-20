@@ -10,7 +10,7 @@ public class FuncCallExpr extends Expr {
     private ArrayList<Expr> args;
 
     @Override
-    public Object eval(Program context) {
+    public Object eval() {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'eval'");
     }

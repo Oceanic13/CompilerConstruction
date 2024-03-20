@@ -1,6 +1,7 @@
 package tree;
 
 import main.Program;
+import main.Scope;
 import utils.DataType;
 
 public class WhileStatement extends Statement {
@@ -15,9 +16,9 @@ public class WhileStatement extends Statement {
     }
 
     @Override
-    public void execute(Program context) {
-        while (DataType.cast(condition.eval(context), Boolean.class)) {
-            sequence.execute(context);
+    public void execute() {
+        while (DataType.cast(condition.eval(), Boolean.class)) {
+            sequence.execute();
         }
     }
     

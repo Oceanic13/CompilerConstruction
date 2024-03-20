@@ -1,6 +1,7 @@
 package tree;
 
 import main.Program;
+import main.Scope;
 import scanner.Token;
 import utils.DataType;
 
@@ -16,8 +17,8 @@ public class UnaryExpr extends Expr {
     }
 
     @Override
-    public Object eval(Program context) {
-        return DataType.apply1(type, child.eval(context));
+    public Object eval() {
+        return DataType.apply1(type, child.eval());
     }
     
     @Override

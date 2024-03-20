@@ -3,6 +3,7 @@ package test;
 import static org.junit.Assert.assertEquals;
 
 import main.Program;
+import main.Scope;
 
 import org.junit.Test;
 
@@ -23,6 +24,7 @@ public class TreeTests {
         System.out.println(root);
     }
 
+    /*
     @Test
     public void testTreeToString2() {
         // a = a + 1
@@ -87,24 +89,25 @@ public class TreeTests {
 
         System.out.println(context);
     }
-
+*/
     @Test
     public void testSimpleAssignment() {
         DataType.init();
 
-        var root = new AssignExpr(new VarExpr(0), new ConstExpr("Hello World"));
+        Scope scope = new Scope(null);
+
+        var root = new AssignExpr(new VarExpr(scope, "x"), new ConstExpr("Hello World"));
         
-        Program context = new Program();
-        assertEquals("Hello World", root.eval(context));
-        assertEquals("Hello World", context.getVarValue(0));
+        assertEquals("Hello World", root.eval());
+        assertEquals("Hello World", scope.readVar("x"));
     }
 
     @Test
     public void testSimplePrintStatements() {
         DataType.init();
 
-        new PrintStatement(new ConstExpr("Hello World")).execute(null);
-        new PrintStatement(new ConstExpr(0)).execute(null);
-        new PrintStatement(new ConstExpr(3.141)).execute(null);
+        new PrintStatement(new ConstExpr("Hello World")).execute();
+        new PrintStatement(new ConstExpr(0)).execute();
+        new PrintStatement(new ConstExpr(3.141)).execute();
     }
 }

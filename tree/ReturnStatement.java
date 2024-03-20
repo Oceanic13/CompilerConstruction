@@ -1,6 +1,7 @@
 package tree;
 
 import main.Program;
+import main.Scope;
 
 public class ReturnStatement extends Statement {
 
@@ -12,8 +13,8 @@ public class ReturnStatement extends Statement {
     }
 
     @Override
-    public void execute(Program context) {
-        expr.eval(context); //TODO: Return this value
+    public void execute() {
+        expr.eval(); //TODO: Return this value
     }
 
     @Override

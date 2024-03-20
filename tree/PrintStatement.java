@@ -1,6 +1,7 @@
 package tree;
 
 import main.Program;
+import main.Scope;
 import utils.DataType;
 
 public class PrintStatement extends Statement {
@@ -13,8 +14,8 @@ public class PrintStatement extends Statement {
     }
 
     @Override
-    public void execute(Program context) {
-        System.out.println(DataType.cast(expr.eval(context), String.class));
+    public void execute() {
+        System.out.println(DataType.cast(expr.eval(), String.class));
     }
 
     @Override

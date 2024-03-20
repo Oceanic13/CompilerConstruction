@@ -13,11 +13,11 @@ public class ArrayExpr extends Expr {
     }
 
     @Override
-    public Object eval(Program context) {
+    public Object eval() {
         int n = items.size();
         Object[] e = new Object[n];
         for (int i = 0; i < n; ++i) {
-            e[i] = items.get(i).eval(context);
+            e[i] = items.get(i).eval();
         }
         return e;
     }

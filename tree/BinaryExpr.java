@@ -1,6 +1,7 @@
 package tree;
 
 import main.Program;
+import main.Scope;
 import scanner.Token;
 import utils.DataType;
 
@@ -17,18 +18,12 @@ public class BinaryExpr extends Expr {
     }
 
     @Override
-    public Object eval(Program context) {
-        return DataType.apply2(TYPE, left.eval(context), right.eval(context));
+    public Object eval() {
+        return DataType.apply2(TYPE, left.eval(), right.eval());
     }
     
     @Override
     public String toString() {
         return String.format("<%s %s %s>", left, TYPE, right);
-    }
-
-    public static class Less extends BinaryExpr {
-        public Less(Expr left, Expr right) {
-            super(Token.Type.LESS, left, right);
-        }
     }
 }

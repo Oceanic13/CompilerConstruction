@@ -45,7 +45,6 @@ public class Lexer {
     private ArrayList<Token> tokens;
     private int line;
     private int index;
-    private HashMap<String, Integer> identifierIds;
 
     public Lexer() {
         this("");
@@ -60,7 +59,6 @@ public class Lexer {
         this.tokens = new ArrayList<>();
         this.line = 0;
         this.index = 0;
-        this.identifierIds = new HashMap<>();
         return this;
     }
     
@@ -146,8 +144,7 @@ public class Lexer {
             addToken(type, word, null);
         } else {
             // identifier
-            identifierIds.putIfAbsent(word, identifierIds.size());
-            addToken(type, word, identifierIds.get(word));
+            addToken(type, word, null);
         }
     }
 

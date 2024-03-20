@@ -10,21 +10,28 @@ public class Program {
     // TODO: functions, objects
     
     private MultiStatement root;
-    private ArrayList<Object> variables;
+    //private ArrayList<Object> variables;
+   private Scope scope;
 
     public Program() {
-        this(new MultiStatement());
+        this(new Scope(null));
     }
 
-    public Program(Statement sequence) {
+    public Program(Scope scope) {
+        this(scope, new MultiStatement());
+    }
+
+    public Program(Scope scope, Statement sequence) {
+        this.scope = scope;
         this.root = new MultiStatement(sequence);
-        this.variables = new ArrayList<>();
+        //this.variables = new ArrayList<>();
     }
 
     public void addStatement(Statement s) {
         root.add(s);
     }
 
+    /*
     public void setVarValue(int varIndex, Object data) {
         while (varIndex >= variables.size()) {
             variables.add(null);
@@ -35,9 +42,14 @@ public class Program {
     public Object getVarValue(int i) {
         return variables.get(i);
     }
+    */
+
+    public Scope getScope() {
+        return scope;
+    }
 
     public void execute() {
-        root.execute(this);
+        root.execute();
     }
 
     @Override
@@ -46,14 +58,6 @@ public class Program {
         b.append("===========================================\n");
         b.append("PROGRAM\n");
         b.append("-------------------------------------------\n");
-        for (int i = 0; i < variables.size(); ++i) {
-            var v = getVarValue(i);
-            if (v == null) {
-                b.append(String.format("VAR %d : <NULL, null>\n", i));
-            } else {
-                b.append(String.format("VAR %d : <%s, %s>\n", i, v.getClass().getSimpleName(), v.toString()));
-            }
-        }
         b.append("-------------------------------------------\n");
         b.append(root.toString()+'\n');
         b.append("===========================================\n");

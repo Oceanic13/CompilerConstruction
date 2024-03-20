@@ -1,6 +1,7 @@
 package tree;
 
 import main.Program;
+import main.Scope;
 import utils.DataType;
 
 public class IfStatement extends Statement {
@@ -17,11 +18,11 @@ public class IfStatement extends Statement {
     }
 
     @Override
-    public void execute(Program context) {
-        if (DataType.cast(ifCondition.eval(context), Boolean.class)) {
-            ifSequence.execute(context);
+    public void execute() {
+        if (DataType.cast(ifCondition.eval(), Boolean.class)) {
+            ifSequence.execute();
         } else {
-            elseSequence.execute(context);
+            elseSequence.execute();
         }
     }
 

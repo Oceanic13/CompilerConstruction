@@ -1,6 +1,7 @@
 package tree;
 
 import main.Program;
+import main.Scope;
 import utils.DataType;
 
 public class ForStatement extends Statement {
@@ -19,14 +20,14 @@ public class ForStatement extends Statement {
     }
 
     @Override
-    public void execute(Program context) {
-        initialization.execute(context);
+    public void execute() {
+        initialization.execute();
 
-        while(DataType.cast(termination.eval(context), Boolean.class)) {
+        while(DataType.cast(termination.eval(), Boolean.class)) {
 
-            sequence.execute(context);
+            sequence.execute();
 
-            increment.execute(context);
+            increment.execute();
         }
     }
     

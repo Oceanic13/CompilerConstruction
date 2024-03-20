@@ -1,11 +1,10 @@
 package tree;
 
-import main.Program;
 import scanner.Token;
 
-public class AssignExpr extends BinaryExpr {
+public class VarDeclExpr extends BinaryExpr {
 
-    public AssignExpr(VarExpr left, Expr right) {
+    public VarDeclExpr(VarExpr left, Expr right) {
         super(Token.Type.ASSIGN, left, right);
     }
 
@@ -13,12 +12,17 @@ public class AssignExpr extends BinaryExpr {
     public Object eval() {
         var r = right.eval();
         var id = (VarExpr)left;
-        id.SCOPE.writeVar(id.NAME, r);
+        id.SCOPE.declVar(id.NAME, r);
         return r;
     }
 
     @Override
     public void execute() {
         eval();
+    }
+
+    @Override
+    public String toString() {
+        return String.format("<%s %s %s>", left, "DECLARE", right);
     }
 }

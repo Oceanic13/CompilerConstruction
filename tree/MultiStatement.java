@@ -10,6 +10,7 @@ public class MultiStatement extends Statement {
     private ArrayList<Statement> sequence;
 
     public MultiStatement(Statement...sequence) {
+        super();
         this.sequence = new ArrayList<>(Arrays.asList(sequence));
     }
 
@@ -18,8 +19,8 @@ public class MultiStatement extends Statement {
     }
 
     @Override
-    public void execute(Program context) {
-        for (var s : sequence) s.execute(context);
+    public void execute() {
+        for (var s : sequence) s.execute();
     }
 
     @Override

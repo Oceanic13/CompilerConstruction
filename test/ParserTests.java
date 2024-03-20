@@ -8,6 +8,7 @@ import java.util.Arrays;
 import org.junit.Test;
 
 import main.Program;
+import main.Scope;
 import parser.Parser;
 import scanner.Lexer;
 import scanner.Token;
@@ -29,12 +30,12 @@ public class ParserTests {
         primary = parser.reset(new Token(Token.Type.TRUE, "true", true, 0)).parsePrimary();
         assertTrue(parser.isAtEnd());
         assertEquals(ConstExpr.class, primary.getClass());
-        assertEquals(true, primary.eval(null));
+        assertEquals(true, primary.eval());
 
         primary = parser.reset(new Token(Token.Type.INT, "123", 123, 0)).parsePrimary();
         assertTrue(parser.isAtEnd());
         assertEquals(ConstExpr.class, primary.getClass());
-        assertEquals(123, primary.eval(null));
+        assertEquals(123, primary.eval());
     }
 
     @Test
@@ -47,12 +48,12 @@ public class ParserTests {
         unary = parser.reset(new Token(Token.Type.TRUE, "true", true, 0)).parseUnary();
         assertTrue(parser.isAtEnd());
         assertEquals(ConstExpr.class, unary.getClass());
-        assertEquals(true, unary.eval(null));
+        assertEquals(true, unary.eval());
 
         unary = parser.reset(new Lexer().reset("-----7").tokenize()).parseUnary();
         assertTrue(parser.isAtEnd());
         assertEquals(UnaryExpr.class, unary.getClass());
-        assertEquals(-7, unary.eval(null));
+        assertEquals(-7, unary.eval());
     }
 
     @Test
@@ -95,7 +96,7 @@ public class ParserTests {
         ifS = parser.reset(new Lexer().reset("if (true) print \"If is True\"; else print \"If is False\"; ").tokenize()).parseIfStatement();
         assertTrue(parser.isAtEnd());
 
-        ifS.execute(null);
+        ifS.execute();
 
         System.out.println(ifS);
     }
@@ -105,12 +106,10 @@ public class ParserTests {
         DataType.init();
 
         var parser = new Parser();
-        IfStatement ifS;
-
-        ifS = parser.reset(new Lexer().reset("if (true) {print \"If is True\";} else {print \"If is False\";} ").tokenize()).parseIfStatement();
+        var p = parser.reset(new Lexer().reset("if (true) {print \"If is True\";} else {print \"If is False\";} ").tokenize()).parse();
         assertTrue(parser.isAtEnd());
 
-        System.out.println(ifS);
+        System.out.println(p);
     }
 
     @Test
@@ -118,11 +117,9 @@ public class ParserTests {
         DataType.init();
 
         var parser = new Parser();
-        ForStatement forS;
-
-        forS = parser.reset(new Lexer().reset("for (var i = 0; i < 10.0; i = i + 1) print i;").tokenize()).parseForStatement();
+        var p = parser.reset(new Lexer().reset("for (var i = 0; i < 10.0; i = i + 1) print i;").tokenize()).parse();
         assertTrue(parser.isAtEnd());
-        new Program(forS).execute();
+        p.execute();
     }
 
     @Test
@@ -130,14 +127,11 @@ public class ParserTests {
         DataType.init();
 
         var parser = new Parser();
-        Expr e;
-
-        e = parser.reset(new Lexer().reset("var x = \"Hello World\"[6]").tokenize()).parseVarDeclaration();
+        var p = parser.reset(new Lexer().reset("var x = \"Hello World\"[6];").tokenize()).parse();
         assertTrue(parser.isAtEnd());
 
-        var p = new Program(e);
         p.execute();
-        assertEquals('W', p.getVarValue(0));
+        assertEquals('W', p.getScope().readVar("x"));
     }
 
     @Test
@@ -145,14 +139,11 @@ public class ParserTests {
         DataType.init();
 
         var parser = new Parser();
-        Expr e;
-
-        e = parser.reset(new Lexer().reset("var a = [1, 10.5, \"Boo\", \'G\', true]").tokenize()).parseVarDeclaration();
+        var p = parser.reset(new Lexer().reset("var a = [1, 10.5, \"Boo\", \'G\', true];").tokenize()).parse();
         assertTrue(parser.isAtEnd());
 
-        var p = new Program(e);
         p.execute();
-        Object[] v = (Object[]) p.getVarValue(0);
+        Object[] v = (Object[]) p.getScope().readVar("a");
     
         assertEquals(1, v[0]);
         assertEquals(10.5, v[1]);
@@ -172,6 +163,6 @@ public class ParserTests {
 
         p.execute();
 
-        assertEquals(512.0, p.getVarValue(0));
+        assertEquals(512.0, p.getScope().readVar("a"));
     }
 }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import main.Program;
+import main.Scope;
 import scanner.NullToken;
 import scanner.Token;
 import scanner.Token.Type;
@@ -15,6 +16,7 @@ import tree.Expr;
 import tree.ForStatement;
 import tree.Statement;
 import tree.UnaryExpr;
+import tree.VarDeclExpr;
 import tree.IfStatement;
 import tree.MultiStatement;
 import tree.NullExpr;
@@ -33,6 +35,7 @@ public class Parser {
     private int index;
     private Stack<Token.Type> bracketsStack;
     private Program context;
+    private Scope globalScope;
 
     public Parser() {
         this(new ArrayList<>(Arrays.asList(new Token(Token.Type.EOF, "", null, 0))));
@@ -54,6 +57,7 @@ public class Parser {
         this.tokens = tokens;
         this.index = 0;
         this.bracketsStack = new Stack<>();
+        this.globalScope = new Scope(null);
         return this;
     }
 
@@ -69,7 +73,7 @@ public class Parser {
     }
 
     public Program parseProgram() {
-        this.context = new Program(parseMultiStatement());
+        this.context = new Program(globalScope, parseMultiStatement());
         return context;
     }
 
@@ -176,7 +180,7 @@ public class Parser {
     /**
      * var_declaration := var IDENTIFIER "=" expression 
      */
-    public AssignExpr parseVarDeclaration() {
+    public VarDeclExpr parseVarDeclaration() {
         consume(Token.Type.VAR);
         Token left = consume(Token.Type.ID);
 
@@ -185,7 +189,7 @@ public class Parser {
             right = parseExpression();
         }
 
-        return new AssignExpr(new VarExpr((int)left.LITERAL), right);
+        return new VarDeclExpr(new VarExpr(globalScope, left.LEXEME), right);
     }
 
     public Expr parseFuncDeclaration() {
@@ -226,7 +230,7 @@ public class Parser {
             var left = consume(Token.Type.ID);
             consume(Token.Type.ASSIGN);
             var right = parseAssignment();
-            return new AssignExpr(new VarExpr((int)left.LITERAL), right);
+            return new AssignExpr(new VarExpr(globalScope, left.LEXEME), right);
         } else {
             return parseLogicOr();
         }
@@ -357,7 +361,7 @@ public class Parser {
                 if (peek(1) == Token.Type.LPAREN) {
                     primary = parseFunctionCall();
                 } else {
-                    primary = new VarExpr((int)advance().LITERAL);
+                    primary = new VarExpr(globalScope, advance().LEXEME);
                 }
                 break;
             case Token.Type.LBOXBRACKET: primary = parseArray(); break;
@@ -421,9 +425,9 @@ public class Parser {
      */
     private ArrayList<VarExpr> parseIdList() {
         ArrayList<VarExpr> exprs = new ArrayList<>();
-        exprs.add(new VarExpr((int)consume(Token.Type.ID).LITERAL));
+        exprs.add(new VarExpr(globalScope, consume(Token.Type.ID).LEXEME));
         while (match(Token.Type.COMMA)) {
-            exprs.add(new VarExpr((int)consume(Token.Type.ID).LITERAL));
+            exprs.add(new VarExpr(globalScope, consume(Token.Type.ID).LEXEME));
         }
         return exprs;
     }
