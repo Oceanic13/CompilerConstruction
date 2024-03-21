@@ -2,16 +2,18 @@ package gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.lang.reflect.Array;
+import java.io.File;
+import java.io.FileWriter;
 
 import javax.swing.Box;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JTextArea;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import parser.Parser;
 import scanner.Lexer;
@@ -24,6 +26,7 @@ public class Window extends JFrame {
     private JTextArea treeLbl;
     private Lexer lexer;
     private Parser parser;
+    private File file;
     
     public Window() {
         super("Compiler Construction - SPL++");
@@ -45,19 +48,21 @@ public class Window extends JFrame {
         setVisible(true);
         setSize(1080, 920);
 
-        var f = new JFrame("Tokens");
+        var tokensFrame = new JFrame("Tokens");
         this.tokensLbl = new JTextArea();
-        f.add(tokensLbl);
-        f.setSize(320, 480);
-        f.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        f.setVisible(true);
+        tokensFrame.add(tokensLbl);
+        tokensFrame.setLocation(getX() + getWidth(), getY());
+        tokensFrame.setSize(320, getHeight()/2);
+        tokensFrame.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        tokensFrame.setVisible(true);
 
-        f = new JFrame("Tree");
+        var treeFrame = new JFrame("Tree");
         this.treeLbl = new JTextArea();
-        f.add(treeLbl);
-        f.setSize(320, 480);
-        f.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        f.setVisible(true);
+        treeFrame.add(treeLbl);
+        treeFrame.setLocation(getX() + getWidth(), tokensFrame.getY() + tokensFrame.getHeight());
+        treeFrame.setSize(320, getHeight()/2);
+        treeFrame.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        treeFrame.setVisible(true);
     }
 
     private JButton initRunButton() {
@@ -81,14 +86,74 @@ public class Window extends JFrame {
     }
 
     private JMenu initFileMenu() {
+        var frame = this;
         JMenu fm = new JMenu("File");
-        JMenuItem exitmi = new JMenuItem("Exit");
-        exitmi.addActionListener(new ActionListener() {
+
+        JMenuItem mi = new JMenuItem("Open");
+        mi.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser fc = new JFileChooser();
+                fc.setCurrentDirectory(new File("."));
+                fc.setFileFilter(new FileNameExtensionFilter("SPL files", "spl"));
+                int result = fc.showOpenDialog(frame);
+                if (result == JFileChooser.APPROVE_OPTION) {
+                    file = fc.getSelectedFile();
+                    frame.editor.setText(Utils.loadSPL(file.getAbsolutePath()));
+                }
+            }
+        });
+        fm.add(mi);
+
+        fm.addSeparator();
+
+        mi = new JMenuItem("Save");
+        mi.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (file == null) return;
+                try {
+                    FileWriter fw = new FileWriter(file);
+                    fw.write(frame.editor.getText());
+                    fw.close();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+        fm.add(mi);
+
+        mi = new JMenuItem("Save As");
+        mi.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser fc = new JFileChooser();
+                fc.setCurrentDirectory(new File("."));
+                fc.setFileFilter(new FileNameExtensionFilter("SPL files", "spl"));
+                int result = fc.showSaveDialog(frame);
+                if (result == JFileChooser.APPROVE_OPTION) {
+                    file = fc.getSelectedFile();
+                    try {
+                        FileWriter fw = new FileWriter(file+".spl");
+                        fw.write(frame.editor.getText());
+                        fw.close();
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        });
+        fm.add(mi);
+
+        fm.addSeparator();
+
+        mi = new JMenuItem("Exit");
+        mi.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 System.exit(0);
             }});
-        fm.add(exitmi);
+        fm.add(mi);
         return fm;
     }
 }

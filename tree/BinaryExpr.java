@@ -1,7 +1,5 @@
 package tree;
 
-import main.Program;
-import main.Scope;
 import scanner.Token;
 import utils.DataType;
 

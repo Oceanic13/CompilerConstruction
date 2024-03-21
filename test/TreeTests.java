@@ -2,7 +2,6 @@ package test;
 
 import static org.junit.Assert.assertEquals;
 
-import main.Program;
 import main.Scope;
 
 import org.junit.Test;
@@ -13,7 +12,6 @@ import tree.BinaryExpr;
 import tree.ConstExpr;
 import tree.PrintStatement;
 import tree.VarExpr;
-import tree.WhileStatement;
 import utils.DataType;
 
 public class TreeTests {

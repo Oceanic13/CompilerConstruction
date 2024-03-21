@@ -1,7 +1,5 @@
 package tree;
 
-import main.Program;
-
 public class NullExpr extends Expr {
 
     private static NullExpr instance;

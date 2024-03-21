@@ -3,8 +3,6 @@ package tree;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import main.Program;
-
 public class MultiStatement extends Statement {
 
     private ArrayList<Statement> sequence;

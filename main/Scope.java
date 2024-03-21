@@ -37,13 +37,13 @@ public class Scope {
 
     public Object readVar(String name) {
         var scope = getVarOrigin(name);
-        if (scope == null) {System.err.printf("Cannot read variable %s!\n", name); return null;}
+        if (scope == null) {System.err.printf("Cannot read undeclared variable %s!\n", name); return null;}
         return scope.vars.get(name);
     }
 
     public void writeVar(String name, Object value) {
         var scope = getVarOrigin(name);
-        if (scope == null) {System.err.printf("Cannot write variable %s!\n", name); return;}
+        if (scope == null) {System.err.printf("Cannot write undeclared variable %s!\n", name); return;}
         scope.vars.put(name, value);
     }
 }

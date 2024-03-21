@@ -1,7 +1,5 @@
 package tree;
 
-import main.Program;
-
 public class ConstExpr extends Expr {
 
     protected Object value;

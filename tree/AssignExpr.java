@@ -1,6 +1,5 @@
 package tree;
 
-import main.Program;
 import scanner.Token;
 
 public class AssignExpr extends BinaryExpr {

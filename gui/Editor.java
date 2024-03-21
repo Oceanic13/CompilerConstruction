@@ -1,6 +1,5 @@
 package gui;
 
-import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 public class Editor extends JTextArea {

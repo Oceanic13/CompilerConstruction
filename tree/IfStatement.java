@@ -1,7 +1,5 @@
 package tree;
 
-import main.Program;
-import main.Scope;
 import utils.DataType;
 
 public class IfStatement extends Statement {

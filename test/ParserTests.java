@@ -3,19 +3,14 @@ package test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Arrays;
-
 import org.junit.Test;
 
-import main.Program;
-import main.Scope;
 import parser.Parser;
 import scanner.Lexer;
 import scanner.Token;
 import tree.BinaryExpr;
 import tree.ConstExpr;
 import tree.Expr;
-import tree.ForStatement;
 import tree.IfStatement;
 import tree.UnaryExpr;
 import utils.DataType;

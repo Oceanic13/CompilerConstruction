@@ -1,14 +1,8 @@
 package test;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
-
-import parser.Parser;
-import scanner.Token;
-import tree.ConstExpr;
-import tree.Expr;
 
 public class JavaTests {
     

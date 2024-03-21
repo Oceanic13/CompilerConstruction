@@ -1,7 +1,5 @@
 package tree;
 
-import main.Program;
-
 public class NullStatement extends Statement {
     
     private static NullStatement instance;
