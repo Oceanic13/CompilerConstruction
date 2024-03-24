@@ -22,6 +22,16 @@ public class Utils
         return -1;
     }
 
+    public static String repeatString(String s, double v) {
+        if (v == 0.) return "";
+        if (v > 0) {
+            String s1 = s.repeat((int)v);
+            String s2 = s.substring(0, (int)(s.length()*(v-(int)v)));
+            return s1 + s2;
+        }
+        return new StringBuilder(repeatString(s, -v)).reverse().toString();
+    }
+
     /**
      * Returns the first line index on which there is a brackets mismatch or -1 if there is no mismatch.
      * @param str input text

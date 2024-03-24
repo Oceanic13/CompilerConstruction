@@ -62,20 +62,15 @@ public class Token {
         FUNC,
         RETURN,
 
-        //BOOL,
-        INT,
-        DEC,
+        NUM,
         STR,
-        CHAR,
 
         ID,
 
         IDX,
 
         CASTBOOl,
-        CASTINT,
-        CASTDEC,
-        CASTCHAR,
+        CASTNUM,
         CASTSTR,
 
         NULL,

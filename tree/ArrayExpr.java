@@ -2,8 +2,6 @@ package tree;
 
 import java.util.ArrayList;
 
-import main.Program;
-
 public class ArrayExpr extends Expr {
 
     private ArrayList<Expr> items;

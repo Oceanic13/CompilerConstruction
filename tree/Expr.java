@@ -1,8 +1,5 @@
 package tree;
 
-import main.Program;
-import main.Scope;
-
 public abstract class Expr extends Statement {
 
     public Expr() {

@@ -353,9 +353,7 @@ public class Parser {
         switch (type) {
             case Token.Type.TRUE: consume(Token.Type.TRUE); primary = new ConstExpr(true); break;
             case Token.Type.FALSE: consume(Token.Type.FALSE); primary = new ConstExpr(false); break;
-            case Token.Type.INT:
-            case Token.Type.DEC:
-            case Token.Type.CHAR:
+            case Token.Type.NUM:
             case Token.Type.STR: primary = new ConstExpr(advance().LITERAL); break;
             case Token.Type.ID:
                 if (peek(1) == Token.Type.LPAREN) {

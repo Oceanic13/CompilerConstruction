@@ -1,7 +1,6 @@
 package scanner;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
 import static java.util.Map.entry;  
@@ -94,9 +93,6 @@ public class Lexer {
             // Strings
             if (c == '\"') {scanString(start); continue;}
 
-            // Characters
-            if (c == '\'') {scanCharacter(start); continue;}
-
             // Keywords or Identifiers
             if (isAlpha(c)) {scanAlphaNumeric(start); continue;}
 
@@ -109,16 +105,6 @@ public class Lexer {
 
         addToken(Token.Type.EOF, '\0', null);
 		return tokens;
-    }
-
-    private void scanCharacter(int start) {
-        assert(input.charAt(start) == '\'');
-        char c = advance();
-        if (!match('\'')) {
-            System.err.println("Undeterminated Character!");
-            System.exit(1);
-        }
-        addToken(Token.Type.CHAR, c, c);
     }
 
     private void scanString(int start) {
@@ -155,11 +141,11 @@ public class Lexer {
         if (match('.')) {
             while (isDigit(peek())) {advance();}
             s = input.substring(start, index);
-            addToken(Token.Type.DEC, s, Double.parseDouble(s));
+            addToken(Token.Type.NUM, s, Double.parseDouble(s));
             return;
         }
         s = input.substring(start, index);
-        addToken(Token.Type.INT, s, Integer.parseInt(s));
+        addToken(Token.Type.NUM, s, (double)Integer.parseInt(s));
     }
 
     private boolean isAlpha(char c) {

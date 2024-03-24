@@ -27,7 +27,7 @@ public class ParserTests {
         assertEquals(ConstExpr.class, primary.getClass());
         assertEquals(true, primary.eval());
 
-        primary = parser.reset(new Token(Token.Type.INT, "123", 123, 0)).parsePrimary();
+        primary = parser.reset(new Token(Token.Type.NUM, "123", 123, 0)).parsePrimary();
         assertTrue(parser.isAtEnd());
         assertEquals(ConstExpr.class, primary.getClass());
         assertEquals(123, primary.eval());
@@ -48,7 +48,7 @@ public class ParserTests {
         unary = parser.reset(new Lexer().reset("-----7").tokenize()).parseUnary();
         assertTrue(parser.isAtEnd());
         assertEquals(UnaryExpr.class, unary.getClass());
-        assertEquals(-7, unary.eval());
+        assertEquals(-7., unary.eval());
     }
 
     @Test
