@@ -15,9 +15,4 @@ public class AssignExpr extends BinaryExpr {
         id.SCOPE.writeVar(id.NAME, r);
         return r;
     }
-
-    @Override
-    public void execute() {
-        eval();
-    }
 }

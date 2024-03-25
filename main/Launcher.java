@@ -14,6 +14,7 @@ public class Launcher {
     public static void main(String[] args) {
         DataType.init();
 
+        /*
         String raw = Utils.loadSPL("spl/print.spl");
         ArrayList<Token> tokens = new Lexer(raw).tokenize();
         System.out.println(Utils.collectionToString(tokens, '\n'));
@@ -22,6 +23,7 @@ public class Launcher {
         System.out.println(p);
 
         p.execute();
+        */
 
         new Window();
     }

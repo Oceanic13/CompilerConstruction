@@ -1,5 +1,7 @@
 package tree;
 
+import utils.ReturnValue;
+
 public class ReturnStatement extends Statement {
 
     private Expr expr;
@@ -10,8 +12,8 @@ public class ReturnStatement extends Statement {
     }
 
     @Override
-    public void execute() {
-        expr.eval(); //TODO: Return this value
+    public Object eval() {
+        return new ReturnValue(expr.eval());
     }
 
     @Override

@@ -2,6 +2,8 @@ package tree;
 
 import main.Scope;
 import utils.DataType;
+import utils.NullObj;
+import utils.ReturnValue;
 
 public class IfStatement extends Statement {
 
@@ -17,12 +19,15 @@ public class IfStatement extends Statement {
     }
 
     @Override
-    public void execute() {
+    public Object eval() {
         if (DataType.cast(ifCondition.eval(), Boolean.class)) {
-            ifSequence.execute();
+            var v = ifSequence.eval();
+            if (v.getClass() == ReturnValue.class) return v;
         } else {
-            elseSequence.execute();
+            var v = elseSequence.eval();
+            if (v.getClass() == ReturnValue.class) return v;
         }
+        return NullObj.get();
     }
 
     @Override

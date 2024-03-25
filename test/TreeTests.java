@@ -11,6 +11,7 @@ import tree.AssignExpr;
 import tree.BinaryExpr;
 import tree.ConstExpr;
 import tree.PrintStatement;
+import tree.VarDeclExpr;
 import tree.VarExpr;
 import utils.DataType;
 
@@ -94,7 +95,7 @@ public class TreeTests {
 
         Scope scope = new Scope(null);
 
-        var root = new AssignExpr(new VarExpr(scope, "x"), new ConstExpr("Hello World"));
+        var root = new VarDeclExpr(new VarExpr(scope, "x"), new ConstExpr("Hello World"));
         
         assertEquals("Hello World", root.eval());
         assertEquals("Hello World", scope.readVar("x"));
@@ -104,8 +105,8 @@ public class TreeTests {
     public void testSimplePrintStatements() {
         DataType.init();
 
-        new PrintStatement(new ConstExpr("Hello World")).execute();
-        new PrintStatement(new ConstExpr(0)).execute();
-        new PrintStatement(new ConstExpr(3.141)).execute();
+        new PrintStatement(new ConstExpr("Hello World")).eval();
+        new PrintStatement(new ConstExpr(0.)).eval();
+        new PrintStatement(new ConstExpr(3.141)).eval();
     }
 }

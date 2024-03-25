@@ -92,7 +92,7 @@ public class ParserTests {
         ifS = parser.reset(new Lexer().reset("if (true) print \"If is True\"; else print \"If is False\"; ").tokenize()).parseIfStatement(new Scope());
         assertTrue(parser.isAtEnd());
 
-        ifS.execute();
+        ifS.eval();
 
         System.out.println(ifS);
     }

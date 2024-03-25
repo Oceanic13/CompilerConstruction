@@ -11,6 +11,6 @@ public abstract class Statement extends Node {
         this.SCOPE = scope;
     }
     
-    public abstract void execute();
+    public abstract Object eval();
 
 }

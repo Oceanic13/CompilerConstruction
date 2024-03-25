@@ -10,6 +10,7 @@ public class Program {
     private MultiStatement root;
     //private ArrayList<Object> variables;
    private Scope scope;
+   private Object returnValue;
 
     public Program() {
         this(new Scope(null));
@@ -47,7 +48,7 @@ public class Program {
     }
 
     public void execute() {
-        root.execute();
+        returnValue = root.eval();
     }
 
     @Override
@@ -59,7 +60,8 @@ public class Program {
         b.append(scope.toString());
         b.append("-------------------------------------------\n");
         b.append(root.toString()+'\n');
-        b.append("===========================================\n");
+        b.append(returnValue);
+        b.append("\n===========================================\n");
         return b.toString();
     }
 }

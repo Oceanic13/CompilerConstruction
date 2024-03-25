@@ -3,7 +3,9 @@ package main;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import tree.Statement;
 import utils.NullObj;
+import utils.Pair;
 
 /**
  * Represents an "area of code" in which certain variables are defined. Each scope
@@ -18,7 +20,7 @@ public class Scope {
     private Scope parent;
     private HashSet<Scope> children;
     private HashMap<String, Object> vars;
-    //private HashMap<String, Program> funcs;
+    private HashMap<String, Pair<String[], Statement>> funcs;
 
     public Scope() {
         this(null);
@@ -26,6 +28,7 @@ public class Scope {
 
     public Scope(Scope parent) {
         this.vars = new HashMap<>();
+        this.funcs = new HashMap<>();
         this.children = new HashSet<>();
         if (parent != null)
             parent.addChild(this);
@@ -67,20 +70,59 @@ public class Scope {
         scope.vars.put(name, value);
     }
 
+    public Scope getFuncOrigin(String name) {
+        if (funcs.containsKey(name)) return this;
+        if (parent == null) return null;
+        return parent.getFuncOrigin(name);
+    }
+
+    public boolean isFuncDeclared(String name) {
+        return getFuncOrigin(name) != null;
+    }
+
+    public void declFunc(String name, String[] argsNames, Statement seq) {
+        if (isFuncDeclared(name)) {
+            System.err.printf("Function %s has already been declared in the current scope %s\n", name, this.hashCode());
+            return;
+        }
+        funcs.put(name, new Pair<>(argsNames, seq));
+    }
+
+    public Object callFunc(String name, Object[] argsValues) {
+        var scope = getFuncOrigin(name);
+        if (scope == null) {System.err.printf("Cannot call undeclared dunction %s in %s\n", name, this.hashCode());  NullObj.get();}
+        var f = scope.funcs.get(name);
+        var argsNames = f.first;
+        int n = argsNames.length;
+        var seq = f.second;
+        seq.SCOPE.clear();
+        assert(n == argsValues.length);
+        for (int i = 0; i < n; ++i) {
+            seq.SCOPE.declVar(argsNames[i], argsValues[i]);
+        }
+        return seq.eval();
+    }
+
     public void clear() {
         vars.clear();
+        funcs.clear();
         for (var s : children) s.clear();
     }
 
     @Override
     public String toString() {
         var b = new StringBuilder();
-        b.append(String.format("Scope(%s):%s {\n", this.hashCode(), (parent==null)? "" : parent.hashCode()));
+        b.append(String.format("Scope(%s):%s\nVariables\n", this.hashCode(), (parent==null)? "" : parent.hashCode()));
         for (var v : vars.keySet()) {
             var o = vars.get(v);
             b.append(String.format("%s = (%s, %s)\n", v, o.getClass().getSimpleName(), o.toString()));
         }
-        b.append(String.format("}\n%s\n", children.toString()));
+        b.append("Functions\n");
+        for (var v : funcs.keySet()) {
+            b.append(String.format("%s\n", v));
+        }
+
+        b.append(String.format("\n%s\n", children.toString()));
         return b.toString();
     }
 

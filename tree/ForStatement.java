@@ -1,6 +1,8 @@
 package tree;
 
 import utils.DataType;
+import utils.NullObj;
+import utils.ReturnValue;
 
 public class ForStatement extends Statement {
 
@@ -18,17 +20,22 @@ public class ForStatement extends Statement {
     }
 
     @Override
-    public void execute() {
-        initialization.execute();
+    public Object eval() {
+        var v = initialization.eval();
+        if (v.getClass() == ReturnValue.class) return v;
 
         while(DataType.cast(termination.eval(), Boolean.class)) {
 
             sequence.SCOPE.clear();
 
-            sequence.execute();
+            v = sequence.eval();
+            if (v.getClass() == ReturnValue.class) return v;
 
-            increment.execute();
+            v = increment.eval();
+            if (v.getClass() == ReturnValue.class) return v;
         }
+
+        return NullObj.get();
     }
     
 }

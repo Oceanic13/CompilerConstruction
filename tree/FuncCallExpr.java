@@ -4,21 +4,29 @@ import java.util.ArrayList;
 
 import main.Program;
 import main.Scope;
+import main.Scope.NullScope;
 
 public class FuncCallExpr extends Expr {
     
-    public FuncCallExpr(Scope scope) {
-        super(scope);
-        //TODO Auto-generated constructor stub
-    }
+    public final String NAME;
+    public final Expr[] ARGS;
 
-    private Program func;
-    private ArrayList<Expr> args;
+    public FuncCallExpr(String name, Expr...args) {
+        super(NullScope.get());
+        this.NAME = name;
+        this.ARGS = args;
+    }
 
     @Override
     public Object eval() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'eval'");
+        var n = ARGS.length;
+        var a = new Object[n];
+        for (int i = 0; i<n; ++i) {
+            a[i] = ARGS[i].eval();
+        }
+
+        // TODO: Func should always define new scope to allow recursion!!!!
+        return SCOPE.callFunc(NAME, a);
     }
 
 

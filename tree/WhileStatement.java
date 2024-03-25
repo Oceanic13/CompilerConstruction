@@ -1,6 +1,8 @@
 package tree;
 
 import utils.DataType;
+import utils.ReturnValue;
+import utils.NullObj;
 
 public class WhileStatement extends Statement {
 
@@ -14,11 +16,13 @@ public class WhileStatement extends Statement {
     }
 
     @Override
-    public void execute() {
+    public Object eval() {
         while (DataType.cast(condition.eval(), Boolean.class)) {
             sequence.SCOPE.clear();
-            sequence.execute();
+            var v = sequence.eval();
+            if (v.getClass() == ReturnValue.class) return v;
         }
+        return NullObj.get();
     }
     
     @Override

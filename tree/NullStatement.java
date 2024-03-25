@@ -1,6 +1,7 @@
 package tree;
 
 import main.Scope;
+import utils.NullObj;
 
 public class NullStatement extends Statement {
     
@@ -11,8 +12,8 @@ public class NullStatement extends Statement {
     }
 
     @Override
-    public void execute() {
-        // Do nothing
+    public Object eval() {
+        return NullObj.get();
     }
 
     public static NullStatement get() {

@@ -17,11 +17,6 @@ public class VarDeclExpr extends BinaryExpr {
     }
 
     @Override
-    public void execute() {
-        eval();
-    }
-
-    @Override
     public String toString() {
         return String.format("<%s %s %s>", left, "DECLARE", right);
     }

@@ -1,6 +1,7 @@
 package tree;
 
 import utils.DataType;
+import utils.NullObj;
 
 public class PrintStatement extends Statement {
 
@@ -12,8 +13,10 @@ public class PrintStatement extends Statement {
     }
 
     @Override
-    public void execute() {
-        System.out.println(DataType.cast(expr.eval(), String.class));
+    public Object eval() {
+        String s = DataType.cast(expr.eval(), String.class);
+        System.out.println(s);
+        return NullObj.get();
     }
 
     @Override

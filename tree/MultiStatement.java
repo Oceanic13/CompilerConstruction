@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import main.Scope;
+import utils.ReturnValue;
+import utils.NullObj;
 
 public class MultiStatement extends Statement {
 
@@ -15,12 +17,18 @@ public class MultiStatement extends Statement {
     }
 
     public void add(Statement...statements) {
-        for (var s : statements) sequence.add(s);
+        for (var s : statements) {sequence.add(s);}
     }
 
     @Override
-    public void execute() {
-        for (var s : sequence) s.execute();
+    public Object eval() {
+        for (var s : sequence) {
+            var v = s.eval();
+            if (v.getClass() == ReturnValue.class) {
+                return v;
+            }
+        }
+        return NullObj.get();
     }
 
     @Override

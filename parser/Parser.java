@@ -14,6 +14,7 @@ import tree.BinaryExpr;
 import tree.ConstExpr;
 import tree.Expr;
 import tree.ForStatement;
+import tree.FuncCallExpr;
 import tree.Statement;
 import tree.UnaryExpr;
 import tree.VarDeclExpr;
@@ -37,6 +38,7 @@ public class Parser {
     private int index;
     private Stack<Token.Type> bracketsStack;
     private Program context;
+    private Scope globalScope;
     //private Scope globalScope;
 
     public Parser() {
@@ -74,7 +76,7 @@ public class Parser {
     }
 
     public Program parseProgram() {
-        var globalScope = new Scope();
+        this.globalScope = new Scope();
         this.context = new Program(globalScope, parseMultiStatement(globalScope));
         return context;
     }
@@ -87,7 +89,7 @@ public class Parser {
 
         switch (peek()) {
             case Token.Type.VAR: s = parseVarDeclaration(scope); consume(Token.Type.SEMICOLON); break;
-            case Token.Type.FUNC: s = parseFuncDeclaration(scope); break;
+            case Token.Type.FUNC: parseFuncDeclaration(); break;
             case Token.Type.IF: s = parseIfStatement(scope); break;
             case Token.Type.WHILE: s = parseWhileStatement(scope); break;
             case Token.Type.FOR: s = parseForStatement(scope); break;
@@ -202,17 +204,19 @@ public class Parser {
         return new VarDeclExpr(new VarExpr(scope, left.LEXEME), right);
     }
 
-    public Expr parseFuncDeclaration(Scope scope) {
+    public void parseFuncDeclaration() {
         //TODO: Handle Scope correctly
+        var funcScope = new Scope(globalScope);
         consume(Token.Type.FUNC);
         var idToken = consume(Token.Type.ID);
         consume(Token.Type.LPAREN);
-        var args = parseIdList(scope);
+        var args = parseIdList();
         consume(Token.Type.RPAREN);
         consume(Token.Type.LBRACE);
-        var seq = parseMultiStatement(scope);
+        var seq = parseMultiStatement(funcScope);
         consume(Token.Type.RBRACE);
-        return NullExpr.get();
+
+        globalScope.declFunc(idToken.LEXEME, args.toArray(new String[]{}), seq);
     }
 
     /**
@@ -397,12 +401,11 @@ public class Parser {
     }
 
     public Expr parseFunctionCall(Scope scope) {
-        // TODO: Handle scope correclty
         var idToken = consume(Token.Type.ID);
         consume(Token.Type.LPAREN);
         var args = parseExprList(scope);
         consume(Token.Type.RPAREN);
-        return NullExpr.get(); //TODO
+        return new FuncCallExpr(idToken.LEXEME, args.toArray(new Expr[]{}));
     }
 
     /**
@@ -434,13 +437,13 @@ public class Parser {
     /**
      * id_list := IDENTIFIER ("," IDENTIFIER)*
      */
-    private ArrayList<VarExpr> parseIdList(Scope scope) {
-        ArrayList<VarExpr> exprs = new ArrayList<>();
-        exprs.add(new VarExpr(scope, consume(Token.Type.ID).LEXEME));
+    private ArrayList<String> parseIdList() {
+        ArrayList<String> ids = new ArrayList<>();
+        ids.add(consume(Token.Type.ID).LEXEME);
         while (match(Token.Type.COMMA)) {
-            exprs.add(new VarExpr(scope, consume(Token.Type.ID).LEXEME));
+            ids.add(consume(Token.Type.ID).LEXEME);
         }
-        return exprs;
+        return ids;
     }
     
     private Token advance() {
