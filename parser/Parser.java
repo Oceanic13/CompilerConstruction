@@ -29,13 +29,15 @@ import utils.Stack;
 
 public class Parser {
 
+    //TODO: Handle Semicolon correctly (smarter)
+
     private static final Token.Type[] BRACKETS = {Type.LPAREN, Type.RPAREN, Type.LBRACE, Type.RBRACE, Type.LBOXBRACKET, Type.RBOXBRACKET};
 
     private ArrayList<Token> tokens;
     private int index;
     private Stack<Token.Type> bracketsStack;
     private Program context;
-    private Scope globalScope;
+    //private Scope globalScope;
 
     public Parser() {
         this(new ArrayList<>(Arrays.asList(new Token(Token.Type.EOF, "", null, 0))));
@@ -57,12 +59,11 @@ public class Parser {
         this.tokens = tokens;
         this.index = 0;
         this.bracketsStack = new Stack<>();
-        this.globalScope = new Scope(null);
         return this;
     }
 
     public Program parse() {
-        var context = parseProgram();
+        parseProgram();
 
         if (!bracketsStack.isEmpty()) {
             System.err.println("Brackets mismatch!");
@@ -73,64 +74,68 @@ public class Parser {
     }
 
     public Program parseProgram() {
-        this.context = new Program(globalScope, parseMultiStatement());
+        var globalScope = new Scope();
+        this.context = new Program(globalScope, parseMultiStatement(globalScope));
         return context;
     }
 
     /**
      * statement := var_declaration | if_statement | while_statement | for_statement | print_statement | expression
      */
-    public Statement parseStatement(boolean expectSemicolonAtEnd) {
+    public Statement parseStatement(Scope scope, boolean expectSemicolonAtEnd) {
         Statement s = NullStatement.get();
 
         switch (peek()) {
-            case Token.Type.VAR: s = parseVarDeclaration(); consume(Token.Type.SEMICOLON); break;
-            case Token.Type.FUNC: s = parseFuncDeclaration(); break;
-            case Token.Type.IF: s = parseIfStatement(); break;
-            case Token.Type.WHILE: s = parseWhileStatement(); break;
-            case Token.Type.FOR: s = parseForStatement(); break;
-            case Token.Type.PRINT: s = parsePrintStatement(); consume(Token.Type.SEMICOLON); break;
-            case Token.Type.RETURN: s = parseReturnStatement(); consume(Token.Type.SEMICOLON); break;
-            default: s = parseExpression(); if (expectSemicolonAtEnd) consume(Token.Type.SEMICOLON); break;
+            case Token.Type.VAR: s = parseVarDeclaration(scope); consume(Token.Type.SEMICOLON); break;
+            case Token.Type.FUNC: s = parseFuncDeclaration(scope); break;
+            case Token.Type.IF: s = parseIfStatement(scope); break;
+            case Token.Type.WHILE: s = parseWhileStatement(scope); break;
+            case Token.Type.FOR: s = parseForStatement(scope); break;
+            case Token.Type.PRINT: s = parsePrintStatement(scope); consume(Token.Type.SEMICOLON); break;
+            case Token.Type.RETURN: s = parseReturnStatement(scope); consume(Token.Type.SEMICOLON); break;
+            default: s = parseExpression(scope); if (expectSemicolonAtEnd) consume(Token.Type.SEMICOLON); break;
         }
         return s;
     }
-    public Statement parseStatement() {return parseStatement(true);}
+    public Statement parseStatement(Scope scope) {return parseStatement(scope, true);}
 
-    public PrintStatement parsePrintStatement() {
+    public PrintStatement parsePrintStatement(Scope scope) {
         consume(Token.Type.PRINT);
-        return new PrintStatement(parseExpression());
+        return new PrintStatement(parseExpression(scope));
     }
 
-    public ReturnStatement parseReturnStatement() {
+    public ReturnStatement parseReturnStatement(Scope scope) {
         consume(Token.Type.RETURN);
-        return new ReturnStatement(parseExpression());
+        return new ReturnStatement(parseExpression(scope));
     } 
 
     /**
      * if_statement := if "("expression")"" (statement | "{"multi_statement"}") (else statement)?
      */
-    public IfStatement parseIfStatement() {
+    public IfStatement parseIfStatement(Scope scope) {
+        Scope ifScope = new Scope(scope);
+
         consume(Token.Type.IF);
         consume(Token.Type.LPAREN);
-        var cond = parseExpression();
+        var cond = parseExpression(ifScope);
         consume(Token.Type.RPAREN);
 
         Statement ifSeq = NullStatement.get();
         if (match(Token.Type.LBRACE)) {
-            ifSeq = parseMultiStatement();
+            ifSeq = parseMultiStatement(ifScope);
             consume(Token.Type.RBRACE);
         } else {
-            ifSeq = parseStatement();
+            ifSeq = parseStatement(ifScope);
         }
         
         Statement elseSeq = NullStatement.get();
+        Scope elseScope = new Scope(scope);
         if (match(Token.Type.ELSE)) {
             if (match(Token.Type.LBRACE)) {
-                elseSeq = parseMultiStatement();
+                elseSeq = parseMultiStatement(elseScope);
                 consume(Token.Type.RBRACE);
             } else {
-                elseSeq = parseStatement();
+                elseSeq = parseStatement(elseScope);
             }
         }
 
@@ -140,38 +145,43 @@ public class Parser {
     /**
      * while_statement := while "("expression")"" (statement | "{"multi_statement"}")
      */
-    public WhileStatement parseWhileStatement() {
+    public WhileStatement parseWhileStatement(Scope scope) {
+        var headScope = scope;//new Scope(scope);
+        var bodyScope = new Scope(headScope);
+
         consume(Token.Type.WHILE);
         consume(Token.Type.LPAREN);
-        var cond = parseExpression();
+        var cond = parseExpression(headScope);
         consume(Token.Type.RPAREN);
 
         Statement seq = NullStatement.get();
         if (match(Token.Type.LBRACE)) {
-            seq = parseMultiStatement();
+            seq = parseMultiStatement(bodyScope);
             consume(Token.Type.RBRACE);
         } else {
-            seq = parseStatement();
+            seq = parseStatement(bodyScope);
         }
 
         return new WhileStatement(cond, seq);
     }
 
-    public ForStatement parseForStatement() {
+    public ForStatement parseForStatement(Scope scope) {
+        Scope headScope = new Scope(scope);
+        Scope bodyScope = new Scope(headScope);
         consume(Token.Type.FOR);
         consume(Token.Type.LPAREN);
-        var init = parseStatement();
-        var cond = parseExpression();
+        var init = parseStatement(headScope);
+        var cond = parseExpression(headScope);
         consume(Token.Type.SEMICOLON);
-        var incr = parseStatement(false);
+        var incr = parseStatement(headScope, false);
         consume(Token.Type.RPAREN);
 
         Statement seq = NullStatement.get();
         if (match(Token.Type.LBRACE)) {
-            seq = parseMultiStatement();
+            seq = parseMultiStatement(bodyScope);
             consume(Token.Type.RBRACE);
         } else {
-            seq = parseStatement();
+            seq = parseStatement(bodyScope);
         }
 
         return new ForStatement(init, cond, incr, seq);
@@ -180,26 +190,27 @@ public class Parser {
     /**
      * var_declaration := var IDENTIFIER "=" expression 
      */
-    public VarDeclExpr parseVarDeclaration() {
+    public VarDeclExpr parseVarDeclaration(Scope scope) {
         consume(Token.Type.VAR);
         Token left = consume(Token.Type.ID);
 
         Expr right = NullExpr.get();
         if (match(Token.Type.ASSIGN)) {
-            right = parseExpression();
+            right = parseExpression(scope);
         }
 
-        return new VarDeclExpr(new VarExpr(globalScope, left.LEXEME), right);
+        return new VarDeclExpr(new VarExpr(scope, left.LEXEME), right);
     }
 
-    public Expr parseFuncDeclaration() {
+    public Expr parseFuncDeclaration(Scope scope) {
+        //TODO: Handle Scope correctly
         consume(Token.Type.FUNC);
         var idToken = consume(Token.Type.ID);
         consume(Token.Type.LPAREN);
-        var args = parseIdList();
+        var args = parseIdList(scope);
         consume(Token.Type.RPAREN);
         consume(Token.Type.LBRACE);
-        var seq = parseMultiStatement();
+        var seq = parseMultiStatement(scope);
         consume(Token.Type.RBRACE);
         return NullExpr.get();
     }
@@ -207,10 +218,11 @@ public class Parser {
     /**
      * multistatement := (statement)*
      */
-    public MultiStatement parseMultiStatement() {
-        var sequence = new MultiStatement();
+    public MultiStatement parseMultiStatement(Scope scope) {
+        var sequence = new MultiStatement(scope);
+
         while (!isAtEnd() && peek() != Token.Type.RBRACE) { // return if reached LBRACE (end of code block)
-            sequence.add(parseStatement());
+            sequence.add(parseStatement(scope));
         }
         return sequence;
     }
@@ -218,32 +230,32 @@ public class Parser {
     /**
      * expression := assignment
      */
-    public Expr parseExpression() {
-        return parseAssignment();
+    public Expr parseExpression(Scope scope) {
+        return parseAssignment(scope);
     }
 
     /**
      * assignment := IDENTIFIER "=" assignment | logic_or
      */
-    public Expr parseAssignment() {
+    public Expr parseAssignment(Scope scope) {
         if (peek(0) == Token.Type.ID && peek(1) == Token.Type.ASSIGN) {
             var left = consume(Token.Type.ID);
             consume(Token.Type.ASSIGN);
-            var right = parseAssignment();
-            return new AssignExpr(new VarExpr(globalScope, left.LEXEME), right);
+            var right = parseAssignment(scope);
+            return new AssignExpr(new VarExpr(scope, left.LEXEME), right);
         } else {
-            return parseLogicOr();
+            return parseLogicOr(scope);
         }
     }
 
     /**
      * logic_or := logic_and ( "or" logic_and )*
      */
-    public Expr parseLogicOr() {
-        Expr lor = parseLogicAnd();
+    public Expr parseLogicOr(Scope scope) {
+        Expr lor = parseLogicAnd(scope);
         while (peek() == Token.Type.OR) {
             var token = advance();
-            var land = parseLogicAnd();
+            var land = parseLogicAnd(scope);
             lor = new BinaryExpr(token.TYPE, lor, land);
         }
         return lor;
@@ -252,11 +264,11 @@ public class Parser {
     /**
      * logic_and := equality ( "and" equality )*
      */
-    public Expr parseLogicAnd() {
-        Expr land = parseEquality();
+    public Expr parseLogicAnd(Scope scope) {
+        Expr land = parseEquality(scope);
         while (peek() == Token.Type.AND) {
             var token = advance();
-            var eq = parseEquality();
+            var eq = parseEquality(scope);
             land = new BinaryExpr(token.TYPE, land, eq);
         }
         return land;
@@ -265,11 +277,11 @@ public class Parser {
     /**
     * equality := comparison ( ( "!=" | "==" ) comparison )*
     **/
-    public Expr parseEquality() {
-        Expr eq = parseComparison();
+    public Expr parseEquality(Scope scope) {
+        Expr eq = parseComparison(scope);
         while (peek() == Token.Type.NEQ || peek() == Token.Type.EQ) {
             var token = advance();
-            var comp = parseComparison();
+            var comp = parseComparison(scope);
             eq = new BinaryExpr(token.TYPE, eq, comp);
         }
         return eq;
@@ -278,11 +290,11 @@ public class Parser {
     /**
     * comparison := term ( ( ">" | ">=" | "<" | "<=" ) term )*
     **/
-    public Expr parseComparison() {
-        Expr comp = parseTerm();
+    public Expr parseComparison(Scope scope) {
+        Expr comp = parseTerm(scope);
         while (peek() == Token.Type.GREATER || peek() == Token.Type.GEQ || peek() == Token.Type.LESS || peek() == Token.Type.LEQ) {
             var token = advance();
-            var term = parseTerm();
+            var term = parseTerm(scope);
             comp = new BinaryExpr(token.TYPE, comp, term);
         }
         return comp;
@@ -291,11 +303,11 @@ public class Parser {
     /**
     * term := factor ( ( "-" | "+" ) factor )*
     **/
-    public Expr parseTerm() {
-        Expr term = parseFactor();
+    public Expr parseTerm(Scope scope) {
+        Expr term = parseFactor(scope);
         while (peek() == Token.Type.MINUS || peek() == Token.Type.PLUS) {
             var token = advance();
-            var factor = parseFactor();
+            var factor = parseFactor(scope);
             term = new BinaryExpr(token.TYPE, term, factor);
         }
         return term;
@@ -304,11 +316,11 @@ public class Parser {
     /**
     * factor := exponent ( ( "/" | "*" ) exponent )*
     **/
-    public Expr parseFactor() {
-        Expr factor = parseExponent();
+    public Expr parseFactor(Scope scope) {
+        Expr factor = parseExponent(scope);
         while (peek() == Token.Type.TIMES || peek() == Token.Type.DIV) {
             var token = advance();
-            var exp = parseExponent();
+            var exp = parseExponent(scope);
             factor = new BinaryExpr(token.TYPE, factor, exp);
         }
         return factor;
@@ -317,11 +329,11 @@ public class Parser {
     /**
      * exponent := unary (^ unary )*
      */
-    public Expr parseExponent() {
-        Expr exp = parseUnary();
+    public Expr parseExponent(Scope scope) {
+        Expr exp = parseUnary(scope);
         while (peek() == Token.Type.POW) {
             var token = advance();
-            var unary = parseUnary();
+            var unary = parseUnary(scope);
             exp = new BinaryExpr(token.TYPE, unary, exp);
         }
         return exp;
@@ -330,22 +342,22 @@ public class Parser {
     /**
      * unary := := ( "!" | "-" ) unary | primary
      **/
-    public Expr parseUnary() {
+    public Expr parseUnary(Scope scope) {
         Token token;
         switch (peek()) {
             case Token.Type.NOT:
             case Token.Type.MINUS:
                 token = advance();
-                return new UnaryExpr(token.TYPE, parseUnary());
+                return new UnaryExpr(token.TYPE, parseUnary(scope));
             default:
-                return parsePrimary();
+                return parsePrimary(scope);
         }
     }
 
     /**
      * primary := ("true" | "false" | NUMBER | STRING | "(" expression ")" | IDENTIFIER | function_call | array) ([expression])*
      **/
-    public Expr parsePrimary() {
+    public Expr parsePrimary(Scope scope) {
         //var token = advance();
         //var type = token.TYPE;
         Expr primary = NullExpr.get();
@@ -357,15 +369,15 @@ public class Parser {
             case Token.Type.STR: primary = new ConstExpr(advance().LITERAL); break;
             case Token.Type.ID:
                 if (peek(1) == Token.Type.LPAREN) {
-                    primary = parseFunctionCall();
+                    primary = parseFunctionCall(scope);
                 } else {
-                    primary = new VarExpr(globalScope, advance().LEXEME);
+                    primary = new VarExpr(scope, advance().LEXEME);
                 }
                 break;
-            case Token.Type.LBOXBRACKET: primary = parseArray(); break;
+            case Token.Type.LBOXBRACKET: primary = parseArray(scope); break;
             case Token.Type.LPAREN:
                 consume(Token.Type.LPAREN);
-                primary = parseExpression();
+                primary = parseExpression(scope);
                 consume(Token.Type.RPAREN);
                 break;
             default:
@@ -376,7 +388,7 @@ public class Parser {
         // parse index operation on string, array, identifier or expression
         if (type == Token.Type.ID || type == Token.Type.STR || type == Token.Type.LBOXBRACKET || type == Token.Type.LPAREN) {
             while (match(Token.Type.LBOXBRACKET)) {
-                primary = new BinaryExpr(Token.Type.IDX, primary, parseExpression());
+                primary = new BinaryExpr(Token.Type.IDX, primary, parseExpression(scope));
                 consume(Token.Type.RBOXBRACKET);
             }
         }
@@ -384,10 +396,11 @@ public class Parser {
         return primary;
     }
 
-    public Expr parseFunctionCall() {
+    public Expr parseFunctionCall(Scope scope) {
+        // TODO: Handle scope correclty
         var idToken = consume(Token.Type.ID);
         consume(Token.Type.LPAREN);
-        var args = parseExprList();
+        var args = parseExprList(scope);
         consume(Token.Type.RPAREN);
         return NullExpr.get(); //TODO
     }
@@ -395,25 +408,25 @@ public class Parser {
     /**
      * array := "[" "]" | "[" expr_list "]"
      **/
-    public ArrayExpr parseArray() {
+    public ArrayExpr parseArray(Scope scope) {
         consume(Token.Type.LBOXBRACKET);
         if (match(Token.Type.RBOXBRACKET)) {
-            return new ArrayExpr(new ArrayList<>()); // empty array
+            return new ArrayExpr(scope, new ArrayList<>()); // empty array
         }   
-        var exprs = parseExprList();
+        var exprs = parseExprList(scope);
         consume(Token.Type.RBOXBRACKET);
 
-        return new ArrayExpr(exprs);
+        return new ArrayExpr(scope, exprs);
     }
 
     /**
      * expr_list := expression ("," expression)*
      */
-    private ArrayList<Expr> parseExprList() {
+    private ArrayList<Expr> parseExprList(Scope scope) {
         ArrayList<Expr> exprs = new ArrayList<>();
-        exprs.add(parseExpression());
+        exprs.add(parseExpression(scope));
         while (match(Token.Type.COMMA)) {
-            exprs.add(parseExpression());
+            exprs.add(parseExpression(scope));
         }
         return exprs;
     }
@@ -421,11 +434,11 @@ public class Parser {
     /**
      * id_list := IDENTIFIER ("," IDENTIFIER)*
      */
-    private ArrayList<VarExpr> parseIdList() {
+    private ArrayList<VarExpr> parseIdList(Scope scope) {
         ArrayList<VarExpr> exprs = new ArrayList<>();
-        exprs.add(new VarExpr(globalScope, consume(Token.Type.ID).LEXEME));
+        exprs.add(new VarExpr(scope, consume(Token.Type.ID).LEXEME));
         while (match(Token.Type.COMMA)) {
-            exprs.add(new VarExpr(globalScope, consume(Token.Type.ID).LEXEME));
+            exprs.add(new VarExpr(scope, consume(Token.Type.ID).LEXEME));
         }
         return exprs;
     }
@@ -449,6 +462,7 @@ public class Parser {
     }
 
     private Token consume(Token.Type expected) {
+
         if (peek() != expected) {
             System.err.printf("Unexpected Token. Expected %s but got %s\n", expected, peek());
             return NullToken.get();

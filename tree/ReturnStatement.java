@@ -5,7 +5,7 @@ public class ReturnStatement extends Statement {
     private Expr expr;
 
     public ReturnStatement(Expr expr) {
-        super();
+        super(expr.SCOPE);
         this.expr = expr;
     }
 

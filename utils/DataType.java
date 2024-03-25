@@ -32,6 +32,8 @@ public abstract class DataType {
         defTypeCast(String.class, Double.class, x -> (double)x.length());
         defTypeCast(String.class, String.class, x -> x);
 
+        defTypeCast(NullObj.class, String.class, x -> x.toString());
+
         defTypeCast(ARRAY_CLASS, String.class, x -> Arrays.toString(x));
 
         // Array indexing

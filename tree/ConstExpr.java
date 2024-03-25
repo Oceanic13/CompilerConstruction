@@ -1,11 +1,13 @@
 package tree;
 
+import main.Scope;
+
 public class ConstExpr extends Expr {
 
     protected Object value;
 
     public ConstExpr(Object value) {
-        super();
+        super(Scope.NullScope.get());
         this.value = value;
     }
 

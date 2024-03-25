@@ -10,7 +10,7 @@ public class ForStatement extends Statement {
     private Statement sequence;
 
     public ForStatement(Statement initialization, Expr termination, Statement increment, Statement sequence) {
-        super();
+        super(initialization.SCOPE);
         this.initialization = initialization;
         this.termination = termination;
         this.increment = increment;
@@ -22,6 +22,8 @@ public class ForStatement extends Statement {
         initialization.execute();
 
         while(DataType.cast(termination.eval(), Boolean.class)) {
+
+            sequence.SCOPE.clear();
 
             sequence.execute();
 

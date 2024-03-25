@@ -2,10 +2,10 @@ var b = true; // A boolean
 var i = 123; // A number
 var d = 12.3; // Another number
 var s = "123"; // This is a string, not a number
-var c = 'A'; // And this is a char
+var a = [b, i, d, s]; // This is an array storing references
 
-i + d; // 135.3
+var sum = i + d; // 135.3
 1 == 2; // false
 !true; // false
 true or false; // true
-var average = (min + max) / 2;
+var average = sum / 2;

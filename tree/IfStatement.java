@@ -1,5 +1,6 @@
 package tree;
 
+import main.Scope;
 import utils.DataType;
 
 public class IfStatement extends Statement {
@@ -9,7 +10,7 @@ public class IfStatement extends Statement {
     private Statement elseSequence;
 
     public IfStatement(Expr ifCondition, Statement ifSequence, Statement elseSequence) {
-        super();
+        super(ifCondition.SCOPE);
         this.ifSequence = ifSequence;
         this.elseSequence = elseSequence;
         this.ifCondition = ifCondition; 

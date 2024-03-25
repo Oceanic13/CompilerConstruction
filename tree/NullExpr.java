@@ -1,11 +1,13 @@
 package tree;
 
+import main.Scope;
+
 public class NullExpr extends Expr {
 
     private static NullExpr instance;
 
     private NullExpr() {
-        super();
+        super(Scope.NullScope.get());
     }
 
     @Override

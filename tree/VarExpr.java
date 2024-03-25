@@ -5,11 +5,9 @@ import main.Scope;
 public class VarExpr extends Expr {
 
     public final String NAME;
-    public final Scope SCOPE;
 
     public VarExpr(Scope scope, String name) {
-        super();
-        this.SCOPE = scope;
+        super(scope);
         this.NAME = name;
     }
 

@@ -8,7 +8,7 @@ public class WhileStatement extends Statement {
     private Statement sequence;
 
     public WhileStatement(Expr condition, Statement sequence) {
-        super();
+        super(condition.SCOPE);
         this.condition = condition;
         this.sequence = sequence;
     }
@@ -16,6 +16,7 @@ public class WhileStatement extends Statement {
     @Override
     public void execute() {
         while (DataType.cast(condition.eval(), Boolean.class)) {
+            sequence.SCOPE.clear();
             sequence.execute();
         }
     }

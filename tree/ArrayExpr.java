@@ -2,11 +2,14 @@ package tree;
 
 import java.util.ArrayList;
 
+import main.Scope;
+
 public class ArrayExpr extends Expr {
 
     private ArrayList<Expr> items;
 
-    public ArrayExpr(ArrayList<Expr> items) {
+    public ArrayExpr(Scope scope, ArrayList<Expr> items) {
+        super(scope);
         this.items = items;
     }
 

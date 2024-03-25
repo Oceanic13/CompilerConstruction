@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import main.Scope;
 import parser.Parser;
 import scanner.Lexer;
 import scanner.Token;
@@ -22,12 +23,12 @@ public class ParserTests {
         var parser = new Parser();
         Expr primary;
 
-        primary = parser.reset(new Token(Token.Type.TRUE, "true", true, 0)).parsePrimary();
+        primary = parser.reset(new Token(Token.Type.TRUE, "true", true, 0)).parsePrimary(null);
         assertTrue(parser.isAtEnd());
         assertEquals(ConstExpr.class, primary.getClass());
         assertEquals(true, primary.eval());
 
-        primary = parser.reset(new Token(Token.Type.NUM, "123", 123, 0)).parsePrimary();
+        primary = parser.reset(new Token(Token.Type.NUM, "123", 123, 0)).parsePrimary(null);
         assertTrue(parser.isAtEnd());
         assertEquals(ConstExpr.class, primary.getClass());
         assertEquals(123, primary.eval());
@@ -40,12 +41,12 @@ public class ParserTests {
         var parser = new Parser();
         Expr unary;
 
-        unary = parser.reset(new Token(Token.Type.TRUE, "true", true, 0)).parseUnary();
+        unary = parser.reset(new Token(Token.Type.TRUE, "true", true, 0)).parseUnary(null);
         assertTrue(parser.isAtEnd());
         assertEquals(ConstExpr.class, unary.getClass());
         assertEquals(true, unary.eval());
 
-        unary = parser.reset(new Lexer().reset("-----7").tokenize()).parseUnary();
+        unary = parser.reset(new Lexer().reset("-----7").tokenize()).parseUnary(null);
         assertTrue(parser.isAtEnd());
         assertEquals(UnaryExpr.class, unary.getClass());
         assertEquals(-7., unary.eval());
@@ -58,7 +59,7 @@ public class ParserTests {
         var parser = new Parser();
         Expr factor;
 
-        factor = parser.reset(new Lexer().reset("3 * x / y * 4").tokenize()).parseFactor();
+        factor = parser.reset(new Lexer().reset("3 * x / y * 4").tokenize()).parseFactor(null);
         assertTrue(parser.isAtEnd());
         assertEquals(Token.Type.TIMES, ((BinaryExpr)factor).TYPE);
 
@@ -73,7 +74,7 @@ public class ParserTests {
         var parser = new Parser();
         Expr e;
 
-        e = parser.reset(new Lexer().reset("true or false").tokenize()).parseExpression();
+        e = parser.reset(new Lexer().reset("true or false").tokenize()).parseExpression(null);
         assertTrue(parser.isAtEnd());
         assertEquals(Token.Type.OR, ((BinaryExpr)e).TYPE);
 
@@ -88,7 +89,7 @@ public class ParserTests {
         var parser = new Parser();
         IfStatement ifS;
 
-        ifS = parser.reset(new Lexer().reset("if (true) print \"If is True\"; else print \"If is False\"; ").tokenize()).parseIfStatement();
+        ifS = parser.reset(new Lexer().reset("if (true) print \"If is True\"; else print \"If is False\"; ").tokenize()).parseIfStatement(new Scope());
         assertTrue(parser.isAtEnd());
 
         ifS.execute();

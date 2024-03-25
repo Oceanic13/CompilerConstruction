@@ -78,8 +78,9 @@ public class Window extends JFrame {
 
                 parser.reset(tokens);
                 var p = parser.parse();
-                treeLbl.setText(p.toString());
                 p.execute();
+
+                treeLbl.setText(p.toString());
             }
         });
         return runBtn;

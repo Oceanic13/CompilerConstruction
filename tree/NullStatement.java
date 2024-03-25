@@ -1,11 +1,13 @@
 package tree;
 
+import main.Scope;
+
 public class NullStatement extends Statement {
     
     private static NullStatement instance;
 
     private NullStatement() {
-        super();
+        super(new Scope());
     }
 
     @Override

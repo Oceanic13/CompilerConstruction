@@ -16,12 +16,12 @@ public class Program {
     }
 
     public Program(Scope scope) {
-        this(scope, new MultiStatement());
+        this(scope, new MultiStatement(scope));
     }
 
     public Program(Scope scope, Statement sequence) {
         this.scope = scope;
-        this.root = new MultiStatement(sequence);
+        this.root = new MultiStatement(scope, sequence);
         //this.variables = new ArrayList<>();
     }
 
@@ -56,6 +56,7 @@ public class Program {
         b.append("===========================================\n");
         b.append("PROGRAM\n");
         b.append("-------------------------------------------\n");
+        b.append(scope.toString());
         b.append("-------------------------------------------\n");
         b.append(root.toString()+'\n');
         b.append("===========================================\n");

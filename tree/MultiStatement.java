@@ -3,12 +3,14 @@ package tree;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import main.Scope;
+
 public class MultiStatement extends Statement {
 
     private ArrayList<Statement> sequence;
 
-    public MultiStatement(Statement...sequence) {
-        super();
+    public MultiStatement(Scope scope, Statement...sequence) {
+        super(scope);
         this.sequence = new ArrayList<>(Arrays.asList(sequence));
     }
 

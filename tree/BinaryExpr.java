@@ -9,7 +9,7 @@ public class BinaryExpr extends Expr {
     public final Token.Type TYPE;
 
     public BinaryExpr(Token.Type type, Expr left, Expr right) {
-        super();
+        super(left.SCOPE);
         this.TYPE = type;
         this.left = left;
         this.right = right;
