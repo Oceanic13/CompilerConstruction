@@ -152,9 +152,10 @@ public class ParserTests {
     public void testPow() {
         DataType.init();
 
-        var parser = new Parser(new Lexer().reset("var a = 2^3^2").tokenize());
+        var parser = new Parser(new Lexer().reset("var a = 2^3^2;").tokenize());
 
         var p = parser.parse();
+        System.out.println(p.toString());
         assertTrue(parser.isAtEnd());
 
         p.execute();

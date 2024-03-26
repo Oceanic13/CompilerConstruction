@@ -19,6 +19,7 @@ import tree.Statement;
 import tree.UnaryExpr;
 import tree.VarDeclExpr;
 import tree.IfStatement;
+import tree.IteratorStatement;
 import tree.MultiStatement;
 import tree.NullExpr;
 import tree.NullStatement;
@@ -38,8 +39,6 @@ public class Parser {
     private int index;
     private Stack<Token.Type> bracketsStack;
     private Program context;
-    private Scope globalScope;
-    //private Scope globalScope;
 
     public Parser() {
         this(new ArrayList<>(Arrays.asList(new Token(Token.Type.EOF, "", null, 0))));
@@ -76,8 +75,8 @@ public class Parser {
     }
 
     public Program parseProgram() {
-        this.globalScope = new Scope();
-        this.context = new Program(globalScope, parseMultiStatement(globalScope));
+        this.context = new Program();
+        context.addStatement(parseMultiStatement(context.getScope()));
         return context;
     }
 
@@ -167,11 +166,32 @@ public class Parser {
         return new WhileStatement(cond, seq);
     }
 
-    public ForStatement parseForStatement(Scope scope) {
+    public Statement parseForStatement(Scope scope) {
         Scope headScope = new Scope(scope);
         Scope bodyScope = new Scope(headScope);
         consume(Token.Type.FOR);
         consume(Token.Type.LPAREN);
+
+        // Parse Iterator Loop
+        if (peek(0) == Token.Type.VAR && peek(1) == Token.Type.ID && peek(2) == Token.Type.COLON) {
+            consume(Token.Type.VAR);
+            var idToken = consume(Token.Type.ID);
+            consume(Token.Type.COLON);
+            var collection = parseExpression(headScope);
+            consume(Token.Type.RPAREN);
+
+            Statement seq = NullStatement.get();
+            if (match(Token.Type.LBRACE)) {
+                seq = parseMultiStatement(bodyScope);
+                consume(Token.Type.RBRACE);
+            } else {
+                seq = parseStatement(bodyScope);
+            }
+
+            return new IteratorStatement(idToken.LEXEME, headScope, collection, seq);
+        }
+
+        // Parse regular for loop
         var init = parseStatement(headScope);
         var cond = parseExpression(headScope);
         consume(Token.Type.SEMICOLON);
@@ -205,18 +225,17 @@ public class Parser {
     }
 
     public void parseFuncDeclaration() {
-        //TODO: Handle Scope correctly
-        var funcScope = new Scope(globalScope);
+        var funcScope = new Scope(context);
         consume(Token.Type.FUNC);
         var idToken = consume(Token.Type.ID);
         consume(Token.Type.LPAREN);
-        var args = parseIdList();
+        var args = (peek() == Token.Type.RPAREN)? new ArrayList<String>() : parseIdList();
         consume(Token.Type.RPAREN);
         consume(Token.Type.LBRACE);
         var seq = parseMultiStatement(funcScope);
         consume(Token.Type.RBRACE);
 
-        globalScope.declFunc(idToken.LEXEME, args.toArray(new String[]{}), seq);
+        context.declFunc(idToken.LEXEME, args.toArray(new String[]{}), seq);
     }
 
     /**
@@ -403,9 +422,9 @@ public class Parser {
     public Expr parseFunctionCall(Scope scope) {
         var idToken = consume(Token.Type.ID);
         consume(Token.Type.LPAREN);
-        var args = parseExprList(scope);
+        var args = (peek() == Token.Type.RPAREN)? new ArrayList<Expr>() : parseExprList(scope);
         consume(Token.Type.RPAREN);
-        return new FuncCallExpr(idToken.LEXEME, args.toArray(new Expr[]{}));
+        return new FuncCallExpr(scope, idToken.LEXEME, args.toArray(new Expr[]{}));
     }
 
     /**
@@ -418,7 +437,6 @@ public class Parser {
         }   
         var exprs = parseExprList(scope);
         consume(Token.Type.RBOXBRACKET);
-
         return new ArrayExpr(scope, exprs);
     }
 

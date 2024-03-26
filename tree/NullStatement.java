@@ -1,5 +1,6 @@
 package tree;
 
+import main.Program;
 import main.Scope;
 import utils.NullObj;
 
@@ -8,7 +9,7 @@ public class NullStatement extends Statement {
     private static NullStatement instance;
 
     private NullStatement() {
-        super(new Scope());
+        super(new Scope(new Program()));
     }
 
     @Override

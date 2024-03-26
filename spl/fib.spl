@@ -4,4 +4,4 @@ func fib(n) {
 	return fib(n-1) + fib(n-2);
 }
 
-return fib(8); // 1, 1, 2, 3, 5, 8, 13, 21, 34
+return fib(10); // 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89

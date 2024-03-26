@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import javax.swing.text.html.HTMLDocument.Iterator;
+
 import scanner.Token;
 import utils.Operation.Binary;
 import utils.Operation.Unary;
@@ -31,8 +33,10 @@ public abstract class DataType {
         defTypeCast(String.class, Boolean.class, x -> x.length()>0);
         defTypeCast(String.class, Double.class, x -> (double)x.length());
         defTypeCast(String.class, String.class, x -> x);
+        defTypeCast(String.class, ARRAY_CLASS, x -> x.split("(?!^)"));
 
         defTypeCast(NullObj.class, String.class, x -> x.toString());
+        defTypeCast(ReturnValue.class, String.class, x -> x.toString());
 
         defTypeCast(ARRAY_CLASS, String.class, x -> Arrays.toString(x));
 
@@ -48,7 +52,7 @@ public abstract class DataType {
         defOp(Token.Type.LEQ, Double.class, Double.class, Boolean.class, (x,y) -> x<=y);
         defOp(Token.Type.GREATER, Double.class, Double.class, Boolean.class, (x,y) -> x>y);
         defOp(Token.Type.GEQ, Double.class, Double.class, Boolean.class, (x,y) -> x>=y);
-        defSymmetricOp(Token.Type.EQ, Double.class, Double.class, Boolean.class, (x,y) -> x==y);
+        defSymmetricOp(Token.Type.EQ, Double.class, Double.class, Boolean.class, (x,y) -> x.doubleValue()==y.doubleValue());
 
         // Numeric, arithmetic operations
         defOp(Token.Type.MINUS, Double.class, Double.class, x -> -x);
@@ -104,10 +108,11 @@ public abstract class DataType {
      * @param to Class to cast to
      * @return Castes Object
      */
+    @SuppressWarnings("unchecked")
     public static <A,B> B cast(A from, Class<B> to) {
+        if (from.getClass() == to) {return (B)from;}
         var tc1 = TYPECASTS.getOrDefault(from.getClass(), null);
         if (tc1 != null) {
-            @SuppressWarnings("unchecked")
             var tc = (TypeCast<A,B>)tc1.getOrDefault(to, null);
             if (tc != null) {
                 return tc.apply(from);
@@ -148,6 +153,7 @@ public abstract class DataType {
      * @return
      * @throws UnsupportedOperationException
      */
+    @SuppressWarnings("unchecked")
     public static <A,B,C> C apply2(Token.Type type, A lhs, B rhs) {
         var t1 = BINARY_OPS.getOrDefault(type, null);
         if (t1 != null) {

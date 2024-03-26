@@ -7,7 +7,7 @@ public class ReturnStatement extends Statement {
     private Expr expr;
 
     public ReturnStatement(Expr expr) {
-        super(expr.SCOPE);
+        super(expr.getScope());
         this.expr = expr;
     }
 

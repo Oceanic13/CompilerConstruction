@@ -12,7 +12,7 @@ public class IfStatement extends Statement {
     private Statement elseSequence;
 
     public IfStatement(Expr ifCondition, Statement ifSequence, Statement elseSequence) {
-        super(ifCondition.SCOPE);
+        super(ifCondition.getScope());
         this.ifSequence = ifSequence;
         this.elseSequence = elseSequence;
         this.ifCondition = ifCondition; 

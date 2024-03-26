@@ -14,7 +14,7 @@ public class ScannerTests {
 
     @Test
     public void testScanner0() {
-        String raw = Utils.loadSPL("spl/0.spl");
+        String raw = Utils.loadSPL("spl/expressions.spl");
         Lexer scanner = new Lexer(raw);
         ArrayList<Token> tokens = scanner.tokenize();
         int n = tokens.size();
@@ -22,7 +22,7 @@ public class ScannerTests {
         assertEquals(Token.Type.VAR, tokens.get(0).TYPE);
         assertEquals(Token.Type.EOF, tokens.get(n-1).TYPE);
 
-        assertEquals(52, n);
+        assertEquals(59, n);
 
         System.out.println(tokens.toString());
     }

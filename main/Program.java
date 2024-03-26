@@ -1,7 +1,13 @@
 package main;
 
+import java.util.HashMap;
+
+import main.Scope.NullScope;
 import tree.MultiStatement;
+import tree.NullStatement;
 import tree.Statement;
+import utils.NullObj;
+import utils.Pair;
 
 public class Program {
 
@@ -12,36 +18,42 @@ public class Program {
    private Scope scope;
    private Object returnValue;
 
+   // Functions and Objects are always global Scope
+   private HashMap<String, Function> funcs;
+
     public Program() {
-        this(new Scope(null));
+        this.scope = new Scope(this);
+        this.root = new MultiStatement(scope);
+        this.funcs = new HashMap<>();
     }
 
-    public Program(Scope scope) {
-        this(scope, new MultiStatement(scope));
-    }
-
-    public Program(Scope scope, Statement sequence) {
-        this.scope = scope;
+    public Program(Statement sequence) {
+        this.scope = new Scope(this);
         this.root = new MultiStatement(scope, sequence);
-        //this.variables = new ArrayList<>();
+        this.funcs = new HashMap<>();
     }
 
     public void addStatement(Statement s) {
         root.add(s);
     }
 
-    /*
-    public void setVarValue(int varIndex, Object data) {
-        while (varIndex >= variables.size()) {
-            variables.add(null);
-        }
-        variables.set(varIndex, data);
+    public boolean isFuncDeclared(String name) {
+        return funcs.containsKey(name);
     }
 
-    public Object getVarValue(int i) {
-        return variables.get(i);
+    public void declFunc(String name, String[] argsNames, Statement seq) {
+        if (isFuncDeclared(name)) {
+            System.err.printf("Function %s has already been declared\n", name);
+            return;
+        }
+        funcs.put(name, new Function(name, argsNames, seq));
     }
-    */
+
+    public Object callFunc(String name, Object[] argsValues) {
+        var f = funcs.getOrDefault(name, null);
+        if (f==null) {System.err.printf("Cannot call undeclared function %s\n", name); return NullObj.get();}
+        return f.eval(argsValues);
+    }
 
     public Scope getScope() {
         return scope;
@@ -56,10 +68,13 @@ public class Program {
         var b = new StringBuilder();
         b.append("===========================================\n");
         b.append("PROGRAM\n");
-        b.append("-------------------------------------------\n");
+        b.append("Scope------------------------------------------\n");
         b.append(scope.toString());
-        b.append("-------------------------------------------\n");
+        b.append("Functions--------------------------------------\n");
+        b.append(funcs.toString()+'\n');
+        b.append("Tree-------------------------------------------\n");
         b.append(root.toString()+'\n');
+        b.append("Returns----------------------------------------\n");
         b.append(returnValue);
         b.append("\n===========================================\n");
         return b.toString();

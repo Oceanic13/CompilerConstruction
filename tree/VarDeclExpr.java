@@ -12,7 +12,7 @@ public class VarDeclExpr extends BinaryExpr {
     public Object eval() {
         var r = right.eval();
         var id = (VarExpr)left;
-        id.SCOPE.declVar(id.NAME, r);
+        id.getScope().declVar(id.NAME, r);
         return r;
     }
 

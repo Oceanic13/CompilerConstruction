@@ -1,0 +1,9 @@
+func foo(x) {
+	return boo(x)+1;
+}
+
+func boo(x) {
+	return 2*x;
+}
+
+return foo(4);

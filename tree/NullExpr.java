@@ -1,6 +1,7 @@
 package tree;
 
 import main.Scope;
+import utils.NullObj;
 
 public class NullExpr extends Expr {
 
@@ -12,7 +13,7 @@ public class NullExpr extends Expr {
 
     @Override
     public Object eval() {
-        return null;
+        return NullObj.get();
     }
     
     public static NullExpr get() {

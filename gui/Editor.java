@@ -9,7 +9,7 @@ public class Editor extends JTextArea {
     public Editor() {
         super();
         setBackground(Color.darkGray);
-        setForeground(Color.green);
+        setForeground(Color.lightGray);
         setTabSize(2);
         setFont(getFont().deriveFont(32f));
     }

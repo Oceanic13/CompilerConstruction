@@ -33,6 +33,7 @@ public class Token {
         LBOXBRACKET,
         RBOXBRACKET,
         SEMICOLON,
+        COLON,
         COMMA,
 
         PLUS,

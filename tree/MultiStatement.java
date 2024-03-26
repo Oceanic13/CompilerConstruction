@@ -11,13 +11,21 @@ public class MultiStatement extends Statement {
 
     private ArrayList<Statement> sequence;
 
+    public MultiStatement(Scope scope) {
+        super(scope);
+        this.sequence = new ArrayList<>();
+    }
+
     public MultiStatement(Scope scope, Statement...sequence) {
         super(scope);
         this.sequence = new ArrayList<>(Arrays.asList(sequence));
     }
 
     public void add(Statement...statements) {
-        for (var s : statements) {sequence.add(s);}
+        for (var s : statements) {
+            assert(s != null);
+            sequence.add(s);
+        }
     }
 
     @Override

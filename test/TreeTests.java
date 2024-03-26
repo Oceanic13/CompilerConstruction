@@ -93,7 +93,7 @@ public class TreeTests {
     public void testSimpleAssignment() {
         DataType.init();
 
-        Scope scope = new Scope(null);
+        Scope scope = new Scope();
 
         var root = new VarDeclExpr(new VarExpr(scope, "x"), new ConstExpr("Hello World"));
         

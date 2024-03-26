@@ -2,6 +2,7 @@ package tree;
 
 import scanner.Token;
 import utils.DataType;
+import utils.ReturnValue;
 
 public class BinaryExpr extends Expr {
 
@@ -9,7 +10,7 @@ public class BinaryExpr extends Expr {
     public final Token.Type TYPE;
 
     public BinaryExpr(Token.Type type, Expr left, Expr right) {
-        super(left.SCOPE);
+        super(left.getScope());
         this.TYPE = type;
         this.left = left;
         this.right = right;
@@ -17,7 +18,11 @@ public class BinaryExpr extends Expr {
 
     @Override
     public Object eval() {
-        return DataType.apply2(TYPE, left.eval(), right.eval());
+        var lt = left.eval();
+        var rt = right.eval();
+        var l = (lt.getClass()==ReturnValue.class)? ((ReturnValue)lt).VALUE : lt;
+        var r = (rt.getClass()==ReturnValue.class)? ((ReturnValue)rt).VALUE : rt;
+        return DataType.apply2(TYPE, l, r);
     }
     
     @Override

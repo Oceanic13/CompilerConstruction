@@ -12,7 +12,7 @@ public class AssignExpr extends BinaryExpr {
     public Object eval() {
         var r = right.eval();
         var id = (VarExpr)left;
-        id.SCOPE.writeVar(id.NAME, r);
+        id.getScope().writeVar(id.NAME, r);
         return r;
     }
 }

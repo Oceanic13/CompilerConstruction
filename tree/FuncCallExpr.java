@@ -1,6 +1,7 @@
 package tree;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import main.Program;
 import main.Scope;
@@ -11,8 +12,8 @@ public class FuncCallExpr extends Expr {
     public final String NAME;
     public final Expr[] ARGS;
 
-    public FuncCallExpr(String name, Expr...args) {
-        super(NullScope.get());
+    public FuncCallExpr(Scope scope, String name, Expr...args) {
+        super(scope);
         this.NAME = name;
         this.ARGS = args;
     }
@@ -25,9 +26,13 @@ public class FuncCallExpr extends Expr {
             a[i] = ARGS[i].eval();
         }
 
-        // TODO: Func should always define new scope to allow recursion!!!!
-        return SCOPE.callFunc(NAME, a);
+        // TODO: Handle scope correctly
+        return getScope().PROGRAM.callFunc(NAME, a);
     }
 
 
+    @Override
+    public String toString() {
+        return String.format("%s(%s)", NAME, Arrays.toString(ARGS));
+    }
 }
