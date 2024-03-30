@@ -1,5 +1,5 @@
 func sayHello(x) {
-    print "Hello, " + x + "!";
+    return "Hello, " + x + "!";
 }
 
-sayHello("Yoshi");
+sayHello(sayHello("Yoshi"));

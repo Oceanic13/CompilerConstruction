@@ -13,7 +13,7 @@ public class PrintStatement extends Statement {
     }
 
     @Override
-    public Object eval() {
+    public Object eval() throws Exception {
         String s = DataType.cast(expr.eval(), String.class);
         System.out.println(s);
         return NullObj.get();

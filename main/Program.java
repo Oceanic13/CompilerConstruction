@@ -19,18 +19,25 @@ public class Program {
    private Object returnValue;
 
    // Functions and Objects are always global Scope
-   private HashMap<String, Function> funcs;
+   private HashMap<String, IFunction> funcs;
 
     public Program() {
         this.scope = new Scope(this);
         this.root = new MultiStatement(scope);
         this.funcs = new HashMap<>();
+        initSystemFuncs();
     }
 
     public Program(Statement sequence) {
         this.scope = new Scope(this);
         this.root = new MultiStatement(scope, sequence);
         this.funcs = new HashMap<>();
+        initSystemFuncs();
+    }
+
+    private void initSystemFuncs() {
+        funcs.put("len", SystemFunction.LENGTH);
+        funcs.put("random", SystemFunction.RANDOM);
     }
 
     public void addStatement(Statement s) {
@@ -49,7 +56,7 @@ public class Program {
         funcs.put(name, new Function(name, argsNames, seq));
     }
 
-    public Object callFunc(String name, Object[] argsValues) {
+    public Object callFunc(String name, Object[] argsValues) throws Exception {
         var f = funcs.getOrDefault(name, null);
         if (f==null) {System.err.printf("Cannot call undeclared function %s\n", name); return NullObj.get();}
         return f.eval(argsValues);
@@ -60,7 +67,11 @@ public class Program {
     }
 
     public void execute() {
-        returnValue = root.eval();
+        try {
+            returnValue = root.eval();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

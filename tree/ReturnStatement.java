@@ -12,7 +12,7 @@ public class ReturnStatement extends Statement {
     }
 
     @Override
-    public Object eval() {
+    public Object eval() throws Exception {
         return new ReturnValue(expr.eval());
     }
 

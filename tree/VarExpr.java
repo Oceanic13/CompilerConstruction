@@ -13,7 +13,7 @@ public class VarExpr extends Expr {
 
     @Override
     public Object eval() {
-        return getScope().readVar(NAME);
+        return getScope().readVar(NAME); // TODO: Eval by reference not by value
     }
     
     @Override

@@ -90,7 +90,7 @@ public class TreeTests {
     }
 */
     @Test
-    public void testSimpleAssignment() {
+    public void testSimpleAssignment() throws Exception {
         DataType.init();
 
         Scope scope = new Scope();
@@ -102,7 +102,7 @@ public class TreeTests {
     }
 
     @Test
-    public void testSimplePrintStatements() {
+    public void testSimplePrintStatements() throws Exception {
         DataType.init();
 
         new PrintStatement(new ConstExpr("Hello World")).eval();

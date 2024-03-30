@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import javax.swing.text.html.HTMLDocument.Iterator;
-
 import scanner.Token;
 import utils.Operation.Binary;
 import utils.Operation.Unary;
@@ -109,7 +107,7 @@ public abstract class DataType {
      * @return Castes Object
      */
     @SuppressWarnings("unchecked")
-    public static <A,B> B cast(A from, Class<B> to) {
+    public static <A,B> B cast(A from, Class<B> to) throws ClassCastException {
         if (from.getClass() == to) {return (B)from;}
         var tc1 = TYPECASTS.getOrDefault(from.getClass(), null);
         if (tc1 != null) {
@@ -118,7 +116,7 @@ public abstract class DataType {
                 return tc.apply(from);
             }
         }
-        throw new ClassCastException(String.format("No Cast defined from %s to %s!", from.getClass().getSimpleName(), to.getSimpleName()));
+        throw utils.Error.undefinedCastException(from.getClass(), to);
     }
 
     /**
@@ -130,7 +128,7 @@ public abstract class DataType {
      * @return result
      * @throws UnsupportedOperationException
      */
-    public static <A,B> B apply1(Token.Type type, A v) {
+    public static <A,B> B apply1(Token.Type type, A v) throws UnsupportedOperationException {
         var t = UNARY_OPS.getOrDefault(type, null);
         if (t != null) {
             @SuppressWarnings("unchecked")
@@ -139,7 +137,7 @@ public abstract class DataType {
                 return u.apply(v);
             }
         }
-        throw new UnsupportedOperationException(String.format("No Unary Operation %s defined for %s!", type.name(), v.getClass().getSimpleName()));
+        throw utils.Error.undefinedUnaryException(type.name(), v.getClass());
     }
 
     /**
@@ -154,7 +152,7 @@ public abstract class DataType {
      * @throws UnsupportedOperationException
      */
     @SuppressWarnings("unchecked")
-    public static <A,B,C> C apply2(Token.Type type, A lhs, B rhs) {
+    public static <A,B,C> C apply2(Token.Type type, A lhs, B rhs) throws UnsupportedOperationException {
         var t1 = BINARY_OPS.getOrDefault(type, null);
         if (t1 != null) {
             var t2 = BINARY_OPS.get(type).getOrDefault(lhs.getClass(), null);
@@ -166,6 +164,6 @@ public abstract class DataType {
                 }
             }
         }
-        throw new UnsupportedOperationException(String.format("No Binary Operation %s defined for %s and %s!", type.name(), lhs.getClass().getSimpleName(), rhs.getClass().getSimpleName()));
+        throw utils.Error.undefinedBinaryException(type.name(), lhs.getClass(), rhs.getClass());
     }
 }

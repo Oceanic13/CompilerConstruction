@@ -19,7 +19,7 @@ import utils.DataType;
 public class ParserTests {
 
     @Test
-    public void testParsePrimary() {
+    public void testParsePrimary() throws Exception {
         var parser = new Parser();
         Expr primary;
 
@@ -35,7 +35,7 @@ public class ParserTests {
     }
 
     @Test
-    public void testParseUnary() {
+    public void testParseUnary() throws Exception {
         DataType.init();
 
         var parser = new Parser();
@@ -83,7 +83,7 @@ public class ParserTests {
     }
 
     @Test
-    public void testSimpleIf1() {
+    public void testSimpleIf1() throws Exception {
         DataType.init();
 
         var parser = new Parser();

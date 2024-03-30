@@ -9,7 +9,7 @@ public class VarDeclExpr extends BinaryExpr {
     }
 
     @Override
-    public Object eval() {
+    public Object eval() throws Exception {
         var r = right.eval();
         var id = (VarExpr)left;
         id.getScope().declVar(id.NAME, r);

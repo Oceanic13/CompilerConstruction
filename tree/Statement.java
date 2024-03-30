@@ -11,7 +11,7 @@ public abstract class Statement extends Node {
         this.scope = scope;
     }
     
-    public abstract Object eval();
+    public abstract Object eval() throws Exception;
 
     //public void setScope(Scope scope) { this.scope = scope;}
 

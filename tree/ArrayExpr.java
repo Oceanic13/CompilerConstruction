@@ -14,7 +14,7 @@ public class ArrayExpr extends Expr {
     }
 
     @Override
-    public Object eval() {
+    public Object eval() throws Exception {
         int n = items.size();
         Object[] e = new Object[n];
         for (int i = 0; i < n; ++i) {

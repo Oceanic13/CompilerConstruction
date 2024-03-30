@@ -1,5 +1,6 @@
 package main;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -20,14 +21,14 @@ public class Scope {
     
     public final Program PROGRAM;
     private Scope parent;
-    private HashSet<Scope> children;
+    private ArrayList<Scope> children;
     private HashMap<String, Object> vars;
 
     private Scope(Program program, Scope parent) {
         this.PROGRAM = program;
         this.parent = parent;
         this.vars = new HashMap<>();
-        this.children = new HashSet<>();
+        this.children = new ArrayList<>();
         if (parent != null)
             parent.addChild(this);
     }
@@ -87,12 +88,21 @@ public class Scope {
         for (var s : children) s.clear();
     }
 
-    public HashMap<String,Object> getSnapshot() {
-        return new HashMap<>(this.vars);
+    // TODO: SNapshot should include all children scope vars as well
+    public Snapshot getSnapshot() {
+        var cs = new ArrayList<Snapshot>();
+        for (var c : children) {
+            cs.add(c.getSnapshot());
+        }
+        return new Snapshot(vars, cs);
     }
 
-    public void setVars(HashMap<String, Object> vars) {
-        this.vars = vars;
+    public void setFromSnapshot(Snapshot snapshot) {
+        this.vars = snapshot.VARS;
+        var n = children.size();
+        for (var i = 0; i < n; ++i) {
+            children.get(i).setFromSnapshot(snapshot.CHILDREN.get(i));
+        }
     }
 
     /*
@@ -137,6 +147,15 @@ public class Scope {
         public static NullScope get() {
             if (instance==null)instance=new NullScope();
             return instance;
+        }
+    }
+
+    public static class Snapshot {
+        public final HashMap<String, Object> VARS;
+        public final ArrayList<Snapshot> CHILDREN;
+        public Snapshot(HashMap<String, Object> vars, ArrayList<Snapshot> children) {
+            this.VARS = new HashMap<>(vars);
+            this.CHILDREN = children;
         }
     }
 }

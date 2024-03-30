@@ -29,7 +29,7 @@ public class MultiStatement extends Statement {
     }
 
     @Override
-    public Object eval() {
+    public Object eval() throws Exception {
         for (var s : sequence) {
             var v = s.eval();
             if (v.getClass() == ReturnValue.class) {

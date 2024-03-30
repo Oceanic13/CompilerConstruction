@@ -16,7 +16,7 @@ public class WhileStatement extends Statement {
     }
 
     @Override
-    public Object eval() {
+    public Object eval() throws Exception {
         while (DataType.cast(condition.eval(), Boolean.class)) {
             sequence.getScope().clear();
             var v = sequence.eval();

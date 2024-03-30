@@ -19,7 +19,7 @@ public class IfStatement extends Statement {
     }
 
     @Override
-    public Object eval() {
+    public Object eval() throws Exception {
         if (DataType.cast(ifCondition.eval(), Boolean.class)) {
             var v = ifSequence.eval();
             if (v.getClass() == ReturnValue.class) return v;

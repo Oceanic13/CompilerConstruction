@@ -21,7 +21,7 @@ public class IteratorStatement extends Statement {
     }
 
     @Override
-    public Object eval() {
+    public Object eval() throws Exception {
         var objs = DataType.cast(collection.eval(), DataType.ARRAY_CLASS);
 
         //System.out.println(Arrays.toString(objs));

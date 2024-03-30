@@ -9,7 +9,7 @@ public class AssignExpr extends BinaryExpr {
     }
 
     @Override
-    public Object eval() {
+    public Object eval() throws Exception {
         var r = right.eval();
         var id = (VarExpr)left;
         id.getScope().writeVar(id.NAME, r);

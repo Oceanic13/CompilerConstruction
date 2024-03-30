@@ -17,7 +17,7 @@ public class BinaryExpr extends Expr {
     }
 
     @Override
-    public Object eval() {
+    public Object eval() throws Exception {
         var lt = left.eval();
         var rt = right.eval();
         var l = (lt.getClass()==ReturnValue.class)? ((ReturnValue)lt).VALUE : lt;

@@ -19,14 +19,12 @@ public class FuncCallExpr extends Expr {
     }
 
     @Override
-    public Object eval() {
+    public Object eval() throws Exception {
         var n = ARGS.length;
         var a = new Object[n];
         for (int i = 0; i<n; ++i) {
             a[i] = ARGS[i].eval();
         }
-
-        // TODO: Handle scope correctly
         return getScope().PROGRAM.callFunc(NAME, a);
     }
 

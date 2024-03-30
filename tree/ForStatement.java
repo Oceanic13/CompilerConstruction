@@ -20,7 +20,7 @@ public class ForStatement extends Statement {
     }
 
     @Override
-    public Object eval() {
+    public Object eval() throws Exception {
         var v = initialization.eval();
         if (v.getClass() == ReturnValue.class) return v;
 

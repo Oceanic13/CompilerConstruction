@@ -15,7 +15,7 @@ public class UnaryExpr extends Expr {
     }
 
     @Override
-    public Object eval() {
+    public Object eval() throws Exception {
         return DataType.apply1(type, child.eval());
     }
     

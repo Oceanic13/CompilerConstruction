@@ -15,7 +15,7 @@ public class CastExpr<T> extends Expr {
     }
 
     @Override
-    public Object eval() {
+    public Object eval() throws Exception {
         var v = child.eval();
         if (v.getClass() == ReturnValue.class) {
             return new ReturnValue(DataType.cast(((ReturnValue)v).VALUE, castTo));

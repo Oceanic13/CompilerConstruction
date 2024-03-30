@@ -1,9 +1,11 @@
 package main;
 
+import tree.ReturnStatement;
 import tree.Statement;
+import tree.VarExpr;
 import utils.NullObj;
 
-public class Function {
+public class Function implements IFunction {
 
     public final String NAME;
     public final String[] ARGSNAMES;
@@ -15,10 +17,10 @@ public class Function {
         this.seq = seq;
     }
 
-    public Object eval(Object[] args) {
+    @Override
+    public Object eval(Object[] args) throws Exception {
         if (ARGSNAMES.length != args.length) {
-            System.err.printf("Invalid nargs for function %s. Expected %d but got %d\n", NAME, ARGSNAMES.length, args.length);
-            return NullObj.get();
+            throw utils.Error.invalidNargsException(NAME, ARGSNAMES.length, args.length);
         }
         int nargs = args.length;
 
@@ -38,13 +40,13 @@ public class Function {
         var res = seq.eval();
 
         // Reset scope
-        scope.setVars(snapshot);
+        scope.setFromSnapshot(snapshot);
 
         return res;
     }
 
     @Override
     public String toString() {
-        return String.format("Function %s with arity %d", NAME, ARGSNAMES.length);
+        return String.format("%s(%d)", NAME, ARGSNAMES.length);
     }
 }
