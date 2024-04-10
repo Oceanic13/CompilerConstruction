@@ -21,6 +21,7 @@ public class Lexer {
         entry("while", Token.Type.WHILE),
         entry("for", Token.Type.FOR),
         entry("func", Token.Type.FUNC),
+        entry("class", Token.Type.CLASS),
         entry("or", Token.Type.OR),
         entry("and", Token.Type.AND)
     );

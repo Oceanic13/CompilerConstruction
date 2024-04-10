@@ -5,7 +5,7 @@ public class NullNode extends Node {
     private static NullNode instance;
 
     private NullNode() {
-        super();
+        super(null);
     }
 
     public static NullNode get() {

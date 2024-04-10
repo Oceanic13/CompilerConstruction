@@ -1,19 +1,16 @@
 package tree;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
-import main.Program;
-import main.Scope;
-import main.Scope.NullScope;
+import main.TPLProgram;
 
 public class FuncCallExpr extends Expr {
     
     public final String NAME;
     public final Expr[] ARGS;
 
-    public FuncCallExpr(Scope scope, String name, Expr...args) {
-        super(scope);
+    public FuncCallExpr(TPLProgram program, String name, Expr...args) {
+        super(program);
         this.NAME = name;
         this.ARGS = args;
     }
@@ -25,7 +22,7 @@ public class FuncCallExpr extends Expr {
         for (int i = 0; i<n; ++i) {
             a[i] = ARGS[i].eval();
         }
-        return getScope().PROGRAM.callFunc(NAME, a);
+        return PROGRAM.callFunc(NAME, a);
     }
 
 

@@ -1,13 +1,7 @@
 package main;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-
-import tree.Statement;
 import utils.NullObj;
-import utils.Pair;
 
 /**
  * Represents an "area of code" in which certain variables are defined. Each scope
@@ -17,43 +11,32 @@ import utils.Pair;
  * A child scope is created within:
  * braces {} or within the body of a FOR, WHILE, IF, ELSE
  */
-public class Scope {
+public class TPLScope {
     
-    public final Program PROGRAM;
-    private Scope parent;
-    private ArrayList<Scope> children;
+    public final TPLProgram PROGRAM;
+    public final TPLScope PARENT;
+    private boolean canSeeParent;
     private HashMap<String, Object> vars;
 
-    private Scope(Program program, Scope parent) {
+    public TPLScope(TPLProgram program, TPLScope parent, boolean canSeeParent) {
         this.PROGRAM = program;
-        this.parent = parent;
+        this.PARENT = parent;
         this.vars = new HashMap<>();
-        this.children = new ArrayList<>();
-        if (parent != null)
-            parent.addChild(this);
+        this.canSeeParent = canSeeParent;
     }
 
-    public Scope(Program program) {
-        this(program, null);
+    public TPLScope(TPLScope parent, boolean canSeeParent) {
+        this(parent.PROGRAM, parent, canSeeParent);
     }
 
-    public Scope(Scope parent) {
-        this(parent.PROGRAM, parent);
+    public TPLScope() {
+        this(null,null,false);
     }
 
-    public Scope() {
-        this(null,null);
-    }
-
-    public void addChild(Scope scope) {
-        this.children.add(scope);
-        scope.parent = this;
-    }
-
-    public Scope getVarOrigin(String name) {
+    public TPLScope getVarOrigin(String name) {
         if (vars.containsKey(name)) return this;
-        if (parent == null) return null;
-        return parent.getVarOrigin(name);
+        if (PARENT == null || !canSeeParent) return null;
+        return PARENT.getVarOrigin(name);
     }
 
     public boolean varIsDeclared(String name) {
@@ -85,24 +68,6 @@ public class Scope {
 
     public void clear() {
         vars.clear();
-        for (var s : children) s.clear();
-    }
-
-    // TODO: SNapshot should include all children scope vars as well
-    public Snapshot getSnapshot() {
-        var cs = new ArrayList<Snapshot>();
-        for (var c : children) {
-            cs.add(c.getSnapshot());
-        }
-        return new Snapshot(vars, cs);
-    }
-
-    public void setFromSnapshot(Snapshot snapshot) {
-        this.vars = snapshot.VARS;
-        var n = children.size();
-        for (var i = 0; i < n; ++i) {
-            children.get(i).setFromSnapshot(snapshot.CHILDREN.get(i));
-        }
     }
 
     /*
@@ -112,7 +77,7 @@ public class Scope {
     */
 
     public boolean isRootScope() {
-        return parent==null;
+        return PARENT==null || !canSeeParent;
     }
 
     /*
@@ -129,33 +94,23 @@ public class Scope {
     @Override
     public String toString() {
         var b = new StringBuilder();
-        b.append(String.format("Scope(%s):%s\nVariables\n", this.hashCode(), (parent==null)? "" : parent.hashCode()));
+        b.append(String.format("Scope(%s):%s\nVariables\n", this.hashCode(), (PARENT==null)? "" : PARENT.hashCode()));
         for (var v : vars.keySet()) {
             var o = vars.get(v);
             b.append(String.format("%s = (%s, %s)\n", v, o.getClass().getSimpleName(), o.toString()));
         }
-        b.append(String.format("%s\n", children.toString()));
         return b.toString();
     }
 
 
-    public static class NullScope extends Scope {
+    public static class NullScope extends TPLScope {
         private static NullScope instance;
         private NullScope() {
-            super(null,null);
+            super(null,null,false);
         }
         public static NullScope get() {
             if (instance==null)instance=new NullScope();
             return instance;
-        }
-    }
-
-    public static class Snapshot {
-        public final HashMap<String, Object> VARS;
-        public final ArrayList<Snapshot> CHILDREN;
-        public Snapshot(HashMap<String, Object> vars, ArrayList<Snapshot> children) {
-            this.VARS = new HashMap<>(vars);
-            this.CHILDREN = children;
         }
     }
 }

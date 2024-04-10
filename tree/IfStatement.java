@@ -1,6 +1,5 @@
 package tree;
 
-import main.Scope;
 import utils.DataType;
 import utils.NullObj;
 import utils.ReturnValue;
@@ -12,7 +11,7 @@ public class IfStatement extends Statement {
     private Statement elseSequence;
 
     public IfStatement(Expr ifCondition, Statement ifSequence, Statement elseSequence) {
-        super(ifCondition.getScope());
+        super(ifCondition.PROGRAM);
         this.ifSequence = ifSequence;
         this.elseSequence = elseSequence;
         this.ifCondition = ifCondition; 

@@ -10,7 +10,7 @@ public class WhileStatement extends Statement {
     private Statement sequence;
 
     public WhileStatement(Expr condition, Statement sequence) {
-        super(condition.getScope());
+        super(condition.PROGRAM);
         this.condition = condition;
         this.sequence = sequence;
     }
@@ -18,7 +18,7 @@ public class WhileStatement extends Statement {
     @Override
     public Object eval() throws Exception {
         while (DataType.cast(condition.eval(), Boolean.class)) {
-            sequence.getScope().clear();
+            PROGRAM.getScope().clear();
             var v = sequence.eval();
             if (v.getClass() == ReturnValue.class) return v;
         }

@@ -1,13 +1,13 @@
 package tree;
 
-import main.Scope;
+import main.TPLProgram;
 
 public class ConstExpr extends Expr {
 
     protected Object value;
 
-    public ConstExpr(Object value) {
-        super(Scope.NullScope.get());
+    public ConstExpr(TPLProgram program, Object value) {
+        super(program);
         this.value = value;
     }
 

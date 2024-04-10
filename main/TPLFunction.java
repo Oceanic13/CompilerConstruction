@@ -1,17 +1,14 @@
 package main;
 
-import tree.ReturnStatement;
 import tree.Statement;
-import tree.VarExpr;
-import utils.NullObj;
 
-public class Function implements IFunction {
+public class TPLFunction implements ITPLFunction {
 
     public final String NAME;
     public final String[] ARGSNAMES;
     private Statement seq;
     
-    public Function(String name, String[] argsNames, Statement seq) {
+    public TPLFunction(String name, String[] argsNames, Statement seq) {
         this.NAME = name;
         this.ARGSNAMES = argsNames;
         this.seq = seq;
@@ -19,17 +16,18 @@ public class Function implements IFunction {
 
     @Override
     public Object eval(Object[] args) throws Exception {
+        return eval(seq.PROGRAM.enterScope(false), args);
+    }
+
+    @Override
+    public Object eval(TPLScope scope, Object[] args) throws Exception {
         if (ARGSNAMES.length != args.length) {
             throw utils.Error.invalidNargsException(NAME, ARGSNAMES.length, args.length);
         }
         int nargs = args.length;
+        var program = seq.PROGRAM;
 
-        var scope = seq.getScope();
         assert(scope.isRootScope());
-
-        // Clear scope
-        var snapshot = scope.getSnapshot();
-        scope.clear();
 
         // Set argument values
         for (int i = 0; i < nargs; ++i) {
@@ -40,7 +38,7 @@ public class Function implements IFunction {
         var res = seq.eval();
 
         // Reset scope
-        scope.setFromSnapshot(snapshot);
+        program.leaveScope();
 
         return res;
     }

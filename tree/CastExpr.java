@@ -1,6 +1,5 @@
 package tree;
 
-import scanner.Token.Type;
 import utils.DataType;
 import utils.ReturnValue;
 
@@ -10,7 +9,7 @@ public class CastExpr<T> extends Expr {
     private Class<T> castTo;
 
     public CastExpr(Class<T> castTo, Expr child) {
-        super(child.getScope());
+        super(child.PROGRAM);
         this.castTo = castTo;
     }
 

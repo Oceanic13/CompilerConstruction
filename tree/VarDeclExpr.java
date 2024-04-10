@@ -12,7 +12,7 @@ public class VarDeclExpr extends BinaryExpr {
     public Object eval() throws Exception {
         var r = right.eval();
         var id = (VarExpr)left;
-        id.getScope().declVar(id.NAME, r);
+        PROGRAM.getScope().declVar(id.NAME, r);
         return r;
     }
 

@@ -9,7 +9,7 @@ public class UnaryExpr extends Expr {
     protected Token.Type type;
 
     public UnaryExpr(Token.Type type, Expr child) {
-        super(child.getScope());
+        super(child.PROGRAM);
         this.type = type;
         this.child = child;
     }

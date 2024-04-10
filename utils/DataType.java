@@ -157,7 +157,6 @@ public abstract class DataType {
         if (t1 != null) {
             var t2 = BINARY_OPS.get(type).getOrDefault(lhs.getClass(), null);
             if (t2 != null) {
-                @SuppressWarnings("unchecked")
                 var b = (Binary<A,B,C>)t2.getOrDefault(rhs.getClass(), null);
                 if (b != null) {
                     return b.apply(lhs, rhs);

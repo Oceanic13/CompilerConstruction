@@ -3,9 +3,8 @@ package main;
 import java.util.Collection;
 
 import utils.DataType;
-import utils.NullObj;
 
-public enum SystemFunction implements IFunction {
+public enum TPLSystemFunction implements ITPLFunction {
     
     LENGTH() {
         @Override
@@ -32,6 +31,10 @@ public enum SystemFunction implements IFunction {
             }
             return Double.valueOf(Math.random());
         }
-        
+    };
+
+    @Override
+    public Object eval(TPLScope scope, Object[] args) throws Exception {
+        return eval(args);
     }
 }

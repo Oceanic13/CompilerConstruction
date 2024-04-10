@@ -3,7 +3,6 @@ package gui;
 import java.awt.Color;
 
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 
 public class Editor extends JScrollPane {

@@ -1,8 +1,5 @@
 package tree;
 
-import java.util.Arrays;
-
-import main.Scope;
 import utils.DataType;
 import utils.NullObj;
 import utils.ReturnValue;
@@ -13,8 +10,8 @@ public class IteratorStatement extends Statement {
     private Expr collection;
     private Statement sequence;
 
-    public IteratorStatement(String iterName, Scope scope, Expr collection, Statement seq) {
-        super(scope);
+    public IteratorStatement(String iterName, Expr collection, Statement seq) {
+        super(collection.PROGRAM);
         this.iterName = iterName;
         this.collection = collection;
         this.sequence = seq;
@@ -29,10 +26,10 @@ public class IteratorStatement extends Statement {
         var n = objs.length;
         if (n == 0) return NullObj.get();
 
-        getScope().declVar(iterName, NullObj.get());
+        PROGRAM.getScope().declVar(iterName, NullObj.get());
 
         for (var obj : objs) {
-            getScope().writeVar(iterName, obj);
+            PROGRAM.getScope().writeVar(iterName, obj);
 
             var v = sequence.eval();
             if (v.getClass() == ReturnValue.class) return v;

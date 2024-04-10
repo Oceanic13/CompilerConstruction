@@ -1,6 +1,5 @@
 package tree;
 
-import main.Scope;
 import utils.NullObj;
 
 public class NullExpr extends Expr {
@@ -8,7 +7,7 @@ public class NullExpr extends Expr {
     private static NullExpr instance;
 
     private NullExpr() {
-        super(Scope.NullScope.get());
+        super(null);
     }
 
     @Override

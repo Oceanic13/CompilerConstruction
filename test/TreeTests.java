@@ -2,12 +2,10 @@ package test;
 
 import static org.junit.Assert.assertEquals;
 
-import main.Scope;
-
+import main.TPLProgram;
 import org.junit.Test;
 
 import scanner.Token;
-import tree.AssignExpr;
 import tree.BinaryExpr;
 import tree.ConstExpr;
 import tree.PrintStatement;
@@ -19,7 +17,8 @@ public class TreeTests {
 
     @Test
     public void testTreeToString1() {
-        var root = new BinaryExpr(Token.Type.PLUS, new ConstExpr(10), new BinaryExpr(Token.Type.TIMES, new ConstExpr(2), new ConstExpr(5)));
+        var program = new TPLProgram();
+        var root = new BinaryExpr(Token.Type.PLUS, new ConstExpr(program, 10), new BinaryExpr(Token.Type.TIMES, new ConstExpr(program, 2), new ConstExpr(program, 5)));
         System.out.println(root);
     }
 
@@ -93,20 +92,22 @@ public class TreeTests {
     public void testSimpleAssignment() throws Exception {
         DataType.init();
 
-        Scope scope = new Scope();
+        var program = new TPLProgram();
 
-        var root = new VarDeclExpr(new VarExpr(scope, "x"), new ConstExpr("Hello World"));
+        var root = new VarDeclExpr(new VarExpr(program, "x"), new ConstExpr(program, "Hello World"));
         
         assertEquals("Hello World", root.eval());
-        assertEquals("Hello World", scope.readVar("x"));
+        assertEquals("Hello World", program.getScope().readVar("x"));
     }
 
     @Test
     public void testSimplePrintStatements() throws Exception {
         DataType.init();
 
-        new PrintStatement(new ConstExpr("Hello World")).eval();
-        new PrintStatement(new ConstExpr(0.)).eval();
-        new PrintStatement(new ConstExpr(3.141)).eval();
+        var program = new TPLProgram();
+
+        new PrintStatement(new ConstExpr(program, "Hello World")).eval();
+        new PrintStatement(new ConstExpr(program, 0.)).eval();
+        new PrintStatement(new ConstExpr(program, 3.141)).eval();
     }
 }

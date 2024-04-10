@@ -1,7 +1,7 @@
 package gui;
 
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.geom.Rectangle2D;
 import java.beans.*;
 import java.util.HashMap;
 import javax.swing.*;
@@ -244,8 +244,8 @@ public class TextLineNumber extends JPanel
 		//  Determine the rows to draw within the clipped bounds.
 
 		Rectangle clip = g.getClipBounds();
-		int rowStartOffset = component.viewToModel( new Point(0, clip.y) );
-		int endOffset = component.viewToModel( new Point(0, clip.y + clip.height) );
+		int rowStartOffset = component.viewToModel2D( new Point(0, clip.y) );
+		int endOffset = component.viewToModel2D( new Point(0, clip.y + clip.height) );
 
 		while (rowStartOffset <= endOffset)
 		{
@@ -320,15 +320,16 @@ public class TextLineNumber extends JPanel
 	{
 		//  Get the bounding rectangle of the row
 
-		Rectangle r = component.modelToView( rowStartOffset );
+		Rectangle2D r = component.modelToView2D( rowStartOffset );
 		int lineHeight = fontMetrics.getHeight();
-		int y = r.y + r.height;
+		int h = (int)(r.getHeight());
+		int y = (int)(r.getY() + h);
 		int descent = 0;
 
 		//  The text needs to be positioned above the bottom of the bounding
 		//  rectangle based on the descent of the font(s) contained on the row.
 
-		if (r.height == lineHeight)  // default font is being used
+		if (h == lineHeight)  // default font is being used
 		{
 			descent = fontMetrics.getDescent();
 		}
@@ -425,14 +426,14 @@ public class TextLineNumber extends JPanel
 				try
 				{
 					int endPos = component.getDocument().getLength();
-					Rectangle rect = component.modelToView(endPos);
+					Rectangle2D rect = component.modelToView2D(endPos);
 
-					if (rect != null && rect.y != lastHeight)
+					if (rect != null && (int)(rect.getY()) != lastHeight)
 					{
 						setPreferredWidth();
 //						repaint();
 						getParent().repaint();
-						lastHeight = rect.y;
+						lastHeight = (int)(rect.getY());
 					}
 				}
 				catch (BadLocationException ex) { /* nothing to do */ }

@@ -2,42 +2,51 @@ package main;
 
 import java.util.HashMap;
 
-import main.Scope.NullScope;
 import tree.MultiStatement;
-import tree.NullStatement;
 import tree.Statement;
 import utils.NullObj;
-import utils.Pair;
 
-public class Program {
+public class TPLProgram {
 
-    // TODO: functions, objects
+    // TODO: objects
     
     private MultiStatement root;
     //private ArrayList<Object> variables;
-   private Scope scope;
+   private TPLScope scope;
    private Object returnValue;
 
    // Functions and Objects are always global Scope
-   private HashMap<String, IFunction> funcs;
+   private HashMap<String, ITPLFunction> funcs;
+   private HashMap<String, TPLClass> classes;
 
-    public Program() {
-        this.scope = new Scope(this);
-        this.root = new MultiStatement(scope);
+    public TPLProgram() {
+        this.scope = new TPLScope(this, null, false);
+        this.root = new MultiStatement(this);
         this.funcs = new HashMap<>();
         initSystemFuncs();
     }
 
-    public Program(Statement sequence) {
-        this.scope = new Scope(this);
-        this.root = new MultiStatement(scope, sequence);
+    public TPLProgram(Statement sequence) {
+        this.scope = new TPLScope(this, null, false);
+        this.root = new MultiStatement(this, sequence);
         this.funcs = new HashMap<>();
         initSystemFuncs();
+    }
+
+    public TPLScope enterScope(boolean canSeeParent) {
+        this.scope = new TPLScope(this, scope, canSeeParent);
+        return this.scope;
+    }
+
+    public TPLScope leaveScope() {
+        assert(!scope.isRootScope());
+        this.scope = scope.PARENT;
+        return this.scope;
     }
 
     private void initSystemFuncs() {
-        funcs.put("len", SystemFunction.LENGTH);
-        funcs.put("random", SystemFunction.RANDOM);
+        funcs.put("len", TPLSystemFunction.LENGTH);
+        funcs.put("random", TPLSystemFunction.RANDOM);
     }
 
     public void addStatement(Statement s) {
@@ -53,7 +62,19 @@ public class Program {
             System.err.printf("Function %s has already been declared\n", name);
             return;
         }
-        funcs.put(name, new Function(name, argsNames, seq));
+        funcs.put(name, new TPLFunction(name, argsNames, seq));
+    }
+
+    public boolean isClassDeclared(String name) {
+        return classes.containsKey(name);
+    }
+
+    public void declClass(String name, TPLClass tplClass) {
+        if (isClassDeclared(name)) {
+            System.err.printf("Class %s has already been declared\n", name);
+            return;
+        }
+        classes.put(name, new TPLClass(this, name));
     }
 
     public Object callFunc(String name, Object[] argsValues) throws Exception {
@@ -62,7 +83,7 @@ public class Program {
         return f.eval(argsValues);
     }
 
-    public Scope getScope() {
+    public TPLScope getScope() {
         return scope;
     }
 

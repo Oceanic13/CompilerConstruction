@@ -61,6 +61,7 @@ public class Token {
         WHILE,
         FOR,
         FUNC,
+        CLASS,
         RETURN,
 
         NUM,

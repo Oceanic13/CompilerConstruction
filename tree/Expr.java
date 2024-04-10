@@ -1,10 +1,10 @@
 package tree;
 
-import main.Scope;
+import main.TPLProgram;
 
 public abstract class Expr extends Statement {
 
-    public Expr(Scope scope) {
-        super(scope);
+    public Expr(TPLProgram program) {
+        super(program);
     }
 }

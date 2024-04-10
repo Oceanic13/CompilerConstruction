@@ -1,19 +1,19 @@
 package tree;
 
-import main.Scope;
+import main.TPLProgram;
 
 public class VarExpr extends Expr {
 
     public final String NAME;
 
-    public VarExpr(Scope scope, String name) {
-        super(scope);
+    public VarExpr(TPLProgram program, String name) {
+        super(program);
         this.NAME = name;
     }
 
     @Override
     public Object eval() {
-        return getScope().readVar(NAME); // TODO: Eval by reference not by value
+        return PROGRAM.getScope().readVar(NAME); // TODO: Eval by reference not by value
     }
     
     @Override

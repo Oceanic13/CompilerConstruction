@@ -1,20 +1,13 @@
 package tree;
 
-import main.Scope;
+import main.TPLProgram;
 
 public abstract class Statement extends Node {
 
-    private Scope scope;
-
-    public Statement(Scope scope) {
-        super();
-        this.scope = scope;
+    public Statement(TPLProgram program) {
+        super(program);
     }
     
     public abstract Object eval() throws Exception;
-
-    //public void setScope(Scope scope) { this.scope = scope;}
-
-    public Scope getScope() {return scope;}
 
 }

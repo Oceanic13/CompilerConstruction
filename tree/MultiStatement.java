@@ -3,7 +3,7 @@ package tree;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import main.Scope;
+import main.TPLProgram;
 import utils.ReturnValue;
 import utils.NullObj;
 
@@ -11,13 +11,13 @@ public class MultiStatement extends Statement {
 
     private ArrayList<Statement> sequence;
 
-    public MultiStatement(Scope scope) {
-        super(scope);
+    public MultiStatement(TPLProgram program) {
+        super(program);
         this.sequence = new ArrayList<>();
     }
 
-    public MultiStatement(Scope scope, Statement...sequence) {
-        super(scope);
+    public MultiStatement(TPLProgram program, Statement...sequence) {
+        super(program);
         this.sequence = new ArrayList<>(Arrays.asList(sequence));
     }
 
